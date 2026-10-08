@@ -1,0 +1,12 @@
+# Godot 4 editor cache and imports (regenerated on open)
+.godot/
+/android/
+
+# Exports
+*.pck
+*.zip
+export_presets.cfg
+
+# OS / editor junk
+.DS_Store
+*.tmp

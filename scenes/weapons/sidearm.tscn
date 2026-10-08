@@ -1,0 +1,560 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/viewmodel_rig.gd" id="1_eo1pr"]
+[ext_resource type="Material" path="res://materials/vm_gun.tres" id="2_s54sm"]
+[ext_resource type="Material" path="res://materials/vm_sight.tres" id="3_48op3"]
+[ext_resource type="Material" path="res://materials/vm_gun_accent.tres" id="4_5y72b"]
+[ext_resource type="Material" path="res://materials/vm_glove.tres" id="5_i5lox"]
+[ext_resource type="Material" path="res://materials/vm_sleeve.tres" id="6_3u2kg"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_u18xf"]
+size = Vector3(0.036, 0.042, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_g5ynp"]
+size = Vector3(0.007, 0.014, 0.01)
+
+[sub_resource type="BoxMesh" id="BoxMesh_w3kpb"]
+size = Vector3(0.007, 0.014, 0.01)
+
+[sub_resource type="BoxMesh" id="BoxMesh_c24i4"]
+size = Vector3(0.006, 0.01, 0.01)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ytfts"]
+size = Vector3(0.007, 0.007, 0.007)
+
+[sub_resource type="BoxMesh" id="BoxMesh_o0lj3"]
+size = Vector3(0.034, 0.03, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wqpeo"]
+size = Vector3(0.018, 0.018, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mq4w2"]
+size = Vector3(0.034, 0.11, 0.048)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vm508"]
+size = Vector3(0.026, 0.03, 0.036)
+
+[sub_resource type="BoxMesh" id="BoxMesh_v4it3"]
+size = Vector3(0.008, 0.02, 0.04)
+
+[sub_resource type="BoxMesh" id="BoxMesh_l0gn3"]
+size = Vector3(0.07, 0.08, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7eld6"]
+size = Vector3(0.085, 0.085, 0.43370494)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lcuku"]
+size = Vector3(0.06, 0.075, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xj5vb"]
+size = Vector3(0.085, 0.085, 0.5096077)
+
+[sub_resource type="Animation" id="Animation_dfm03"]
+length = 0.65
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0.05, -0.35, 0.05, 0.2, 1, 0, -0.02, 0, 0.42, 1, 0, 0, 0, 0.5, 1, 0, 0, 0.015, 0.65, 1, 0, 0, 0)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, -0.3862204, 0.18526386, 0.26925567, 0.8625616, 0.2, 1, -0.04357787, 0.0019026508, 0.04357787, 0.99809736, 0.42, 1, 0.026161006, 0.0009135623, -0.034887537, 0.99904835, 0.5, 1, -0.034766693, -0.0030416918, -0.08710266, 0.9955879, 0.65, 1, 0, 0, 0, 1)
+tracks/2/type = "position_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/Gun")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, -0.035, 0)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Pivot/Gun")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.08, 1, 0, 0, 0, 1, 0.10666667, 1, 0.5, 0, 0, 0.8660254, 0.13333334, 1, 0.8660254, 0, 0, 0.49999997, 0.16, 1, 1, 0, 0, -4.371139e-08, 0.18666667, 1, -0.8660253, 0, 0, 0.50000006, 0.21333334, 1, -0.5, 0, 0, 0.8660254, 0.24, 1, 8.742278e-08, 0, 0, 1, 0.26666668, 1, 0.49999997, 0, 0, 0.8660254, 0.29333332, 1, 0.86602545, 0, 0, 0.49999994, 0.32, 1, 1, 0, 0, -1.1924881e-08, 0.34666666, 1, 0.86602545, 0, 0, -0.49999994, 0.37333333, 1, -0.5000002, 0, 0, 0.8660253, 0.4, 1, 1.7484555e-07, 0, 0, 1)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Pivot/Gun/Magazine")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, -0.10000001, 0.078)
+tracks/5/type = "position_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Pivot/Gun/Slide")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0.055, -0.03, 0.45, 1, 0, 0.055, -0.03, 0.5, 1, 0, 0.055, 0.01, 0.56, 1, 0, 0.055, -0.03)
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": ["swap", -8.0],
+"method": &"play_sfx"
+}, {
+"args": ["rack", -4.0],
+"method": &"play_sfx"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_81t84"]
+length = 0.28
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0.02, -0.25, 0.05, 0.168, 1, 0, 0.008, -0.005, 0.28, 1, 0, 0, 0)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, -0.32132062, 0.13982055, 0.19191113, 0.91671884, 0.168, 1, 0.03504506, -0.008110833, -0.017136605, 0.9992059, 0.28, 1, 0, 0, 0, 1)
+tracks/2/type = "position_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/Gun")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, -0.035, 0)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Pivot/Gun")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Pivot/Gun/Magazine")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, -0.10000001, 0.078)
+tracks/5/type = "position_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Pivot/Gun/Slide")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0.055, -0.03)
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["swap", -10.0],
+"method": &"play_sfx"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_edand"]
+length = 0.05
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/2/type = "position_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/Gun")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, -0.035, 0)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Pivot/Gun")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Pivot/Gun/Magazine")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, -0.10000001, 0.078)
+tracks/5/type = "position_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Pivot/Gun/Slide")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0.055, -0.03)
+
+[sub_resource type="Animation" id="Animation_5j5kb"]
+length = 2.6
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.3, 1, -0.06, 0.05, 0.08, 1, 1, -0.06, 0.05, 0.08, 1.3, 1, -0.03, 0.04, 0.06, 2, 1, -0.03, 0.04, 0.06, 2.6, 1, 0, 0, 0)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.3, 1, 0.04331018, 0.30784836, -0.14999536, 0.9385388, 1, 1, 0.04331018, 0.30784836, -0.14999536, 0.9385388, 1.15, 1, 0.065340884, -0.002852844, 0.043525998, 0.9969092, 1.3, 1, -0.024408244, -0.30230248, 0.21903136, 0.92738485, 2, 1, -0.024408244, -0.30230248, 0.21903136, 0.92738485, 2.6, 1, 0, 0, 0, 1)
+tracks/2/type = "position_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/Gun")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, -0.035, 0)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Pivot/Gun")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 1.4, 1, 0, 0, 0, 1, 1.4277778, 1, 0.5, 0, 0, 0.8660254, 1.4555556, 1, 0.8660254, 0, 0, 0.49999997, 1.4833333, 1, 1, 0, 0, -4.371139e-08, 1.5111111, 1, -0.8660253, 0, 0, 0.50000006, 1.5388889, 1, -0.5, 0, 0, 0.8660254, 1.5666667, 1, 8.742278e-08, 0, 0, 1, 1.5944444, 1, 0.49999997, 0, 0, 0.8660254, 1.6222222, 1, 0.86602545, 0, 0, 0.49999994, 1.65, 1, 1, 0, 0, -1.1924881e-08, 1.6777778, 1, 0.86602545, 0, 0, -0.49999994, 1.7055556, 1, -0.5000002, 0, 0, 0.8660253, 1.7333333, 1, 1.7484555e-07, 0, 0, 1, 1.7611111, 1, 0.50000006, 0, 0, 0.8660254, 1.7888889, 1, 0.86602545, 0, 0, 0.5, 1.8166667, 1, 1, 0, 0, 1.3907092e-07, 1.8444444, 1, -0.8660254, 0, 0, 0.5000002, 1.8722222, 1, -0.4999999, 0, 0, 0.86602545, 1.9, 1, 2.3849761e-08, 0, 0, 1)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Pivot/Gun/Magazine")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, -0.10000001, 0.078)
+tracks/5/type = "position_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Pivot/Gun/Slide")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0.055, -0.03)
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(1.4, 1.9),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": ["swap", -12.0],
+"method": &"play_sfx"
+}, {
+"args": ["catch", -6.0],
+"method": &"play_sfx"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_qarii"]
+length = 0.5
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.08, 1, -0.06, -0.3, 0.06, 0.36, 1, -0.06, -0.3, 0.06, 0.5, 1, 0, 0, 0)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.08, 1, -0.29619002, 0.30305657, 0.35022494, 0.83532673, 0.36, 1, -0.29619002, 0.30305657, 0.35022494, 0.83532673, 0.5, 1, 0, 0, 0, 1)
+tracks/2/type = "position_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/Gun")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, -0.035, 0)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Pivot/Gun")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Pivot/Gun/Magazine")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, -0.10000001, 0.078)
+tracks/5/type = "position_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Pivot/Gun/Slide")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0.055, -0.03)
+
+[sub_resource type="Animation" id="Animation_yysfq"]
+length = 2.1
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.25, 1, 0, -0.02, 0.02, 1.25, 1, 0, -0.03, 0.02, 1.32, 1, 0, 0.01, 0.02, 1.45, 1, 0, -0.02, 0.02, 2.1, 1, 0, 0, 0)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.25, 1, 0.18746428, 0.046355776, 0.19756463, 0.9610809, 1.25, 1, 0.20513414, 0.037027888, 0.22043735, 0.9528674, 1.32, 1, 0.25331727, 0.03261186, 0.18034405, 0.9498647, 1.5, 1, 0.16633254, 0.037855424, 0.17728893, 0.9692621, 2.1, 1, 0, 0, 0, 1)
+tracks/2/type = "position_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/Gun")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, -0.035, 0)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Pivot/Gun")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Pivot/Gun/Magazine")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, -0.10000001, 0.078, 0.3, 1, 0, -0.10000001, 0.078, 0.5, 1, 0, -0.5, 0.178, 0.9, 1, 0, -0.45, 0.178, 1.2, 1, 0, -0.13000001, 0.088, 1.3, 1, 0, -0.10000001, 0.078, 2.1, 1, 0, -0.10000001, 0.078)
+tracks/5/type = "position_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Pivot/Gun/Slide")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0.055, -0.03)
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0.35, 1.3),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": ["mag_out", -6.0],
+"method": &"play_sfx"
+}, {
+"args": ["mag_in", -3.0],
+"method": &"play_sfx"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_ufhvn"]
+length = 2.6
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.25, 1, 0, -0.02, 0.02, 1.25, 1, 0, -0.03, 0.02, 1.32, 1, 0, 0.01, 0.02, 1.45, 1, 0, -0.02, 0.02, 1.7, 1, 0, -0.01, 0.01, 1.8, 1, 0, 0.01, 0, 2, 1, 0, 0, 0, 2.6, 1, 0, 0, 0)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.25, 1, 0.18746428, 0.046355776, 0.19756463, 0.9610809, 1.25, 1, 0.20513414, 0.037027888, 0.22043735, 0.9528674, 1.32, 1, 0.25331727, 0.03261186, 0.18034405, 0.9498647, 1.5, 1, 0.16633254, 0.037855424, 0.17728893, 0.9692621, 1.7, 1, 0.08980132, 0.027042901, 0.083741084, 0.9920644, 1.8, 1, 0.034899496, 0, 0, 0.99939084, 2, 1, -0.017452406, 0, 0, 0.9998477, 2.6, 1, 0, 0, 0, 1)
+tracks/2/type = "position_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/Gun")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, -0.035, 0)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Pivot/Gun")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Pivot/Gun/Magazine")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, -0.10000001, 0.078, 0.3, 1, 0, -0.10000001, 0.078, 0.5, 1, 0, -0.5, 0.178, 0.9, 1, 0, -0.45, 0.178, 1.2, 1, 0, -0.13000001, 0.088, 1.3, 1, 0, -0.10000001, 0.078)
+tracks/5/type = "position_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Pivot/Gun/Slide")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0.055, -0.03, 0.1, 1, 0, 0.055, 0.01, 1.75, 1, 0, 0.055, 0.01, 1.8, 1, 0, 0.055, -0.03)
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0.35, 1.3, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": ["mag_out", -6.0],
+"method": &"play_sfx"
+}, {
+"args": ["mag_in", -3.0],
+"method": &"play_sfx"
+}, {
+"args": ["rack", -2.0],
+"method": &"play_sfx"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bcwae"]
+_data = {
+&"draw": SubResource("Animation_dfm03"),
+&"draw_quick": SubResource("Animation_81t84"),
+&"idle": SubResource("Animation_edand"),
+&"inspect": SubResource("Animation_5j5kb"),
+&"melee_lower": SubResource("Animation_qarii"),
+&"reload": SubResource("Animation_yysfq"),
+&"reload_empty": SubResource("Animation_ufhvn")
+}
+
+[node name="Sidearm" type="Node3D" unique_id=2046741945]
+script = ExtResource("1_eo1pr")
+
+[node name="Pivot" type="Node3D" parent="." unique_id=1553618119]
+
+[node name="Gun" type="Node3D" parent="Pivot" unique_id=278186554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.035, 0)
+
+[node name="Slide" type="MeshInstance3D" parent="Pivot/Gun" unique_id=694639477]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, -0.03)
+material_override = ExtResource("2_s54sm")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_u18xf")
+
+[node name="RearSightL" type="MeshInstance3D" parent="Pivot/Gun/Slide" unique_id=45438073]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.009, 0.028, 0.09)
+material_override = ExtResource("2_s54sm")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_g5ynp")
+
+[node name="RearSightR" type="MeshInstance3D" parent="Pivot/Gun/Slide" unique_id=1060191956]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009, 0.028, 0.09)
+material_override = ExtResource("2_s54sm")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_w3kpb")
+
+[node name="FrontSight" type="MeshInstance3D" parent="Pivot/Gun/Slide" unique_id=730420775]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.026, -0.09)
+material_override = ExtResource("2_s54sm")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_c24i4")
+
+[node name="FrontSightDot" type="MeshInstance3D" parent="Pivot/Gun/Slide" unique_id=2074819051]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0325, -0.09)
+material_override = ExtResource("3_48op3")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_ytfts")
+
+[node name="Frame" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1613435739]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.023, -0.02)
+material_override = ExtResource("4_5y72b")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_o0lj3")
+
+[node name="Barrel" type="MeshInstance3D" parent="Pivot/Gun" unique_id=842276638]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, -0.14)
+material_override = ExtResource("2_s54sm")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_wqpeo")
+
+[node name="Grip" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1382867369]
+transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0, -0.040000003, 0.06)
+material_override = ExtResource("2_s54sm")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_mq4w2")
+
+[node name="Magazine" type="MeshInstance3D" parent="Pivot/Gun" unique_id=907927619]
+transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0, -0.10000001, 0.078)
+material_override = ExtResource("4_5y72b")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_vm508")
+
+[node name="TriggerGuard" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1922221518]
+material_override = ExtResource("2_s54sm")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_v4it3")
+
+[node name="Muzzle" type="Marker3D" parent="Pivot/Gun" unique_id=1831682975]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, -0.16)
+
+[node name="Arms" type="Node3D" parent="Pivot" unique_id=254756870]
+
+[node name="RightHand" type="MeshInstance3D" parent="Pivot/Arms" unique_id=1062038979]
+transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0.005, -0.075, 0.075)
+material_override = ExtResource("5_i5lox")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_l0gn3")
+
+[node name="RightForearm" type="MeshInstance3D" parent="Pivot/Arms" unique_id=1722953974]
+transform = Transform3D(-0.9593655, 0.1626488, -0.2305715, 0, 0.8171474, 0.5764288, 0.28216633, 0.5530059, -0.78394306, 0.07, -0.23500001, 0.28)
+material_override = ExtResource("6_3u2kg")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_7eld6")
+
+[node name="LeftHand" type="MeshInstance3D" parent="Pivot/Arms" unique_id=676048154]
+transform = Transform3D(0.90630776, -0.42261827, 0, 0.4082179, 0.87542605, 0.25881904, -0.10938165, -0.23456971, 0.9659258, -0.035, -0.08, 0.06)
+material_override = ExtResource("5_i5lox")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_lcuku")
+
+[node name="LeftForearm" type="MeshInstance3D" parent="Pivot/Arms" unique_id=1215804293]
+transform = Transform3D(-0.82136995, -0.29101396, 0.49057347, 0, 0.86005795, 0.51019645, -0.5703959, 0.41906002, -0.7064257, -0.17500001, -0.23, 0.26999998)
+material_override = ExtResource("6_3u2kg")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_xj5vb")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=890109188]
+libraries/ = SubResource("AnimationLibrary_bcwae")

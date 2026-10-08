@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://materials/viewmodel.gdshader" id="1_cb55e"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_cb55e")
+shader_parameter/albedo = Color(0.3, 0.33, 0.2, 1)
+shader_parameter/roughness = 0.8
+shader_parameter/metallic = 0.0
+shader_parameter/depth_scale = null
+shader_parameter/emission = Color(0, 0, 0, 1)

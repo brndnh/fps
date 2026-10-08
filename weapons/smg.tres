@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/smg.tscn" id="1_kmdsm"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_lvfa7"]
+
+[resource]
+script = ExtResource("2_lvfa7")
+display_name = "SMG"
+model_scene = ExtResource("1_kmdsm")
+sound_prefix = "smg"
+bolt_kick = 0.018
+rpm = 1000.0
+damage = 11.0
+head_multiplier = 1.5
+falloff_start = 20.0
+falloff_end = 50.0
+falloff_min = 0.6
+mag_size = 22
+reserve_ammo = 220
+reload_time = 1.8
+reload_empty_time = 2.4
+draw_time = 0.5
+holster_time = 0.2
+ads_time = 0.18
+ads_zoom = 1.1
+ads_move_speed = 0.7
+sprint_to_fire_time = 0.18
+hip_spread = 1.3
+move_spread = 0.7
+air_spread = 1.2
+bloom_per_shot = 0.08
+bloom_max = 0.8
+bloom_decay = 6.0
+recoil_pattern = PackedVector2Array(0, 0.34, 0.14259318, 0.34, 0.12935942, 0.34, -0.025239311, 0.34, -0.15225632, 0.34, -0.11288645, 0.28, 0.04984662, 0.28, 0.15810692, 0.28, 0.09358675, 0.28, -0.07320575, 0.28, -0.15999843, 0.28, -0.071943596, 0.28, 0.09473176, 0.28, 0.15788351, 0.28, 0.048498936, 0.28, -0.113885656, 0.28, -0.15181512, 0.28, -0.023839844, 0.28, 0.1301878, 0.28, 0.1419452, 0.28, -0.0014162095, 0.28, -0.14322998, 0.28)
+recoil_jitter = 0.08
+recoil_recovery = 12.0
+view_punch = 0.45
+hip_position = Vector3(0.17, -0.19, -0.47)
+ads_position = Vector3(0, -0.0745, -0.33)
+kick_back = 0.025
+kick_rotation = 2.2
+muzzle_flash_size = 0.8

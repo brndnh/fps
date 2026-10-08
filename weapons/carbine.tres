@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/carbine.tscn" id="1_15h1c"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_4m5yp"]
+
+[resource]
+script = ExtResource("2_4m5yp")
+display_name = "Carbine"
+model_scene = ExtResource("1_15h1c")
+rpm = 780.0
+draw_time = 0.55
+quick_draw_time = 0.4
+recoil_pattern = PackedVector2Array(0.035462424, 0.42, 0.08179665, 0.42, 0.11184469, 0.42, 0.1196238, 0.42, 0.103585124, 0.42, 0.066922046, 0.42, 0.0169344, 0.34, -0.036424983, 0.34, -0.08253194, 0.34, -0.11220631, 0.34, -0.11953975, 0.34, -0.10307214, 0.34, -0.06608226, 0.34, -0.01593503, 0.34, 0.037384965, 0.26, 0.08326139, 0.26, 0.11256, 0.26, 0.11944725, 0.26, 0.10255187, 0.26, 0.06523781, 0.26, 0.0149345305, 0.26, -0.038342305, 0.26, -0.08398496, 0.26, -0.112905726, 0.26, -0.11934631, 0.26, -0.10202435, 0.26, -0.06438875, 0.26, -0.013932977, 0.26)
+ads_position = Vector3(0, -0.0775, -0.36)
+throw_damage = 30.0

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/knife_bayonet.tscn" id="1_xsy83"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_7tu6a"]
+
+[resource]
+script = ExtResource("2_7tu6a")
+display_name = "Bayonet"
+model_scene = ExtResource("1_xsy83")
+sound_prefix = ""
+is_melee = true
+bolt_node = NodePath("")
+mag_size = 0
+reserve_ammo = 0
+draw_time = 0.4
+quick_draw_time = 0.25
+move_speed = 1.12
+holster_time = 0.15
+sprint_to_fire_time = 0.0
+recoil_pattern = PackedVector2Array()
+hip_position = Vector3(0.2, -0.2, -0.42)
+ads_position = Vector3(0.2, -0.2, -0.42)

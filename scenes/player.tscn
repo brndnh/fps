@@ -1,0 +1,70 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_smehm"]
+[ext_resource type="Script" path="res://scripts/player/viewmodel.gd" id="2_ur7pv"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="7_f1ej7"]
+[ext_resource type="Script" path="res://scripts/ui/crosshair.gd" id="8_oprun"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_manager.gd" id="9_wpnmg"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="10_wdata"]
+[ext_resource type="Resource" path="res://weapons/carbine.tres" id="11_carbn"]
+[ext_resource type="Resource" path="res://weapons/sidearm.tres" id="13_sidea"]
+[ext_resource type="Script" path="res://scripts/ui/weapon_hud.gd" id="14_wphud"]
+[ext_resource type="Resource" path="res://weapons/knife.tres" id="15_knife"]
+[ext_resource type="Script" path="res://scripts/ui/buy_menu.gd" id="16_buymn"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_a8ls1"]
+radius = 0.4
+height = 1.8
+
+[node name="Player" type="CharacterBody3D" unique_id=72762536]
+floor_max_angle = 0.80285144
+floor_snap_length = 0.35
+script = ExtResource("1_smehm")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1508580626]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_a8ls1")
+
+[node name="Head" type="Node3D" parent="." unique_id=488469393]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head" unique_id=1404556143]
+current = true
+fov = 90.0
+
+[node name="Viewmodel" type="Node3D" parent="Head/Camera3D" unique_id=1921888129]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19, -0.2, -0.52)
+script = ExtResource("2_ur7pv")
+
+[node name="DebugHUD" type="CanvasLayer" parent="." unique_id=1670610870]
+script = ExtResource("7_f1ej7")
+
+[node name="Crosshair" type="Control" parent="DebugHUD" unique_id=1028548538]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("8_oprun")
+
+[node name="Stats" type="Label" parent="DebugHUD" unique_id=2029796086]
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 20.0
+offset_bottom = 16.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+
+[node name="Weapons" type="Node" parent="." unique_id=1005171447]
+script = ExtResource("9_wpnmg")
+starting_weapons = Array[ExtResource("10_wdata")]([ExtResource("11_carbn"), ExtResource("13_sidea")])
+melee_weapon = ExtResource("15_knife")
+
+[node name="WeaponHUD" type="CanvasLayer" parent="." unique_id=828582554]
+script = ExtResource("14_wphud")
+
+[node name="BuyMenu" type="CanvasLayer" parent="."]
+script = ExtResource("16_buymn")

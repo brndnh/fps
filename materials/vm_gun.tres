@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/viewmodel.gdshader" id="1_ygr4o"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ygr4o")
+shader_parameter/albedo = Color(0.17, 0.18, 0.2, 1)
+shader_parameter/roughness = 0.45
+shader_parameter/metallic = 0.3
+shader_parameter/depth_scale = null
