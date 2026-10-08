@@ -1,16 +1,19 @@
 class_name WeaponPickup
 extends RigidBody3D
 ## A gun lying in the world. Look at it and press Interact (E) to pick it up.
+## Walking over it with a free gun slot picks it up too (not for guns on a rack).
 ## Remembers its ammo. A thrown gun damages the first target it hits hard enough.
 
 const LAYER := 2 ## Physics layer for pickups: bullets and the player pass through them.
 const THROW_HIT_SPEED := 4.0
+const AUTO_PICKUP_DELAY := 1.0 ## Seconds before a gun you dropped or threw can be walked over and taken again.
 
 @export var weapon: WeaponData
 @export var mag: int = -1 ## -1 = full.
 @export var reserve: int = -1
 
 var thrower: WeaponManager ## Set while the gun is in flight after a throw.
+var auto_pickup_delay := 0.0
 var _speed := 0.0 ## Last tick's speed (contacts report after the bounce).
 
 static var _world_mats := {}
@@ -39,6 +42,7 @@ static func spawn(parent: Node, data: WeaponData, ammo: int, spare: int, at: Tra
 	p.mag = ammo
 	p.reserve = spare
 	p.thrower = by
+	p.auto_pickup_delay = AUTO_PICKUP_DELAY
 	parent.add_child(p)
 	p.global_transform = at
 	p.linear_velocity = velocity
@@ -46,8 +50,14 @@ static func spawn(parent: Node, data: WeaponData, ammo: int, spare: int, at: Tra
 	return p
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	_speed = linear_velocity.length()
+	auto_pickup_delay = maxf(auto_pickup_delay - delta, 0.0)
+
+
+## Landed (not in flight) and not just dropped.
+func can_auto_pickup() -> bool:
+	return thrower == null and auto_pickup_delay <= 0.0
 
 
 func _on_body_entered(body: Node) -> void:

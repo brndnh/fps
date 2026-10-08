@@ -22,8 +22,8 @@ const REBINDABLE := {
 		["fire", "Fire"], ["aim", "Aim"], ["reload", "Reload"],
 		["inspect", "Inspect"], ["melee", "Melee"],
 		["weapon_1", "Weapon 1"], ["weapon_2", "Weapon 2"], ["weapon_3", "Knife"],
-		["weapon_next", "Next weapon"], ["weapon_prev", "Previous weapon"],
-		["throw_weapon", "Throw weapon"], ["interact", "Pick up"], ["buy_menu", "Buy menu"],
+		["weapon_last", "Last weapon"], ["weapon_next", "Next weapon"], ["weapon_prev", "Previous weapon"],
+		["throw_weapon", "Throw weapon"], ["interact", "Pick up"], ["buy_menu", "Buy menu"], ["map_menu", "Maps"],
 	],
 }
 const SLOTS := 2
@@ -31,10 +31,14 @@ const SLOTS := 2
 ## Knives in the buy menu: [id, name, resource]. The last one bought is saved.
 const KNIVES := [
 	["combat", "Combat Knife", "res://weapons/knife.tres"],
+	["bayonet", "Bayonet", "res://weapons/knife_bayonet.tres"],
+	["m9", "M9 Bayonet", "res://weapons/knife_m9.tres"],
+	["bowie", "Bowie Knife", "res://weapons/knife_bowie.tres"],
 	["karambit", "Karambit", "res://weapons/knife_karambit.tres"],
 	["butterfly", "Butterfly Knife", "res://weapons/knife_butterfly.tres"],
 	["flip", "Flip Knife", "res://weapons/knife_flip.tres"],
-	["bayonet", "Bayonet", "res://weapons/knife_bayonet.tres"],
+	["stiletto", "Stiletto Knife", "res://weapons/knife_stiletto.tres"],
+	["daggers", "Shadow Daggers", "res://weapons/knife_daggers.tres"],
 ]
 
 var sensitivity: float = 2.0

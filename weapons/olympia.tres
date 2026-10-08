@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/olympia.tscn" id="1_wcj54"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_wj870"]
+
+[resource]
+script = ExtResource("2_wj870")
+display_name = "Olympia"
+model_scene = ExtResource("1_wcj54")
+sound_prefix = "olympia"
+bolt_node = NodePath("")
+bolt_kick = 0.0
+fire_mode = 1
+rpm = 300.0
+damage = 12.0
+head_multiplier = 1.5
+pellets = 9
+pellet_spread = 4.0
+pellet_spread_ads = 2.6
+falloff_start = 10.0
+falloff_end = 28.0
+falloff_min = 0.35
+mag_size = 2
+reserve_ammo = 24
+reload_time = 2.0
+reload_empty_time = 2.0
+reload_commit = 0.6
+draw_time = 0.6
+holster_time = 0.22
+ads_time = 0.2
+ads_zoom = 1.1
+ads_move_speed = 0.65
+sprint_to_fire_time = 0.2
+hip_spread = 0.4
+move_spread = 0.6
+air_spread = 1.0
+bloom_per_shot = 0.0
+bloom_max = 0.0
+recoil_pattern = PackedVector2Array(0.2, 3, -0.25, 3.2)
+recoil_jitter = 0.25
+recoil_recovery = 16.0
+view_punch = 2.6
+hip_position = Vector3(0.17, -0.19, -0.5)
+ads_position = Vector3(0, -0.045, -0.36)
+kick_back = 0.07
+kick_rotation = 9.0
+muzzle_flash_size = 1.7
+throw_damage = 30.0

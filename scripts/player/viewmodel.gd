@@ -17,11 +17,18 @@ extends Node3D
 @export var bob_frequency: float = 0.28 ## Cycles per metre travelled.
 @export var bob_amount: Vector2 = Vector2(0.010, 0.008)
 
+@export_group("Idle")
+## Breathing sway while you stand still, so the hands never freeze. Fades out as the
+## walk bob takes over, and shrinks with the rest of the motion when aimed.
+@export var idle_position: Vector3 = Vector3(0.0025, 0.0035, 0.002) ## Metres.
+@export var idle_rotation_deg: Vector3 = Vector3(0.7, 0.5, 0.6)
+@export var idle_speed: float = 1.0 ## 1 = one slow breath every ~4 s.
+
 @export_group("Poses")
 @export var sprint_position: Vector3 = Vector3(-0.03, -0.05, 0.03)
 @export var sprint_rotation_deg: Vector3 = Vector3(-12.0, 28.0, 8.0)
 @export var slide_position: Vector3 = Vector3(-0.02, -0.02, 0.02)
-@export var slide_rotation_deg: Vector3 = Vector3(0.0, 0.0, -14.0)
+@export var slide_rotation_deg: Vector3 = Vector3(0.0, 0.0, -14.0) ## The roll (z) is for sliding right; it mirrors sliding left and fades out sliding straight.
 @export var pose_speed: float = 9.0
 
 @export_group("Vertical")
@@ -42,6 +49,7 @@ var _sway_target := Vector3.ZERO
 var _sway := Vector3.ZERO
 var _bob_phase := 0.0
 var _bob_weight := 0.0
+var _idle_t := 0.0
 var _pose_pos := Vector3.ZERO
 var _pose_rot := Vector3.ZERO
 var _vertical := 0.0
@@ -91,12 +99,21 @@ func _process(delta: float) -> void:
 	_bob_phase = fmod(_bob_phase + speed * bob_frequency * delta * TAU, TAU * 2.0)
 	var bob := Vector3(sin(_bob_phase) * bob_amount.x, sin(_bob_phase * 2.0) * bob_amount.y, 0.0) * _bob_weight
 
+	# Idle breathing: a few slow, out-of-step waves so it never looks like a loop.
+	_idle_t += delta * idle_speed
+	var still := clampf(1.0 - _bob_weight * 1.5, 0.0, 1.0)
+	var breath := sin(_idle_t * 1.6)
+	var idle_pos := Vector3(sin(_idle_t * 0.9) * idle_position.x, breath * idle_position.y,
+			sin(_idle_t * 1.3 + 1.0) * idle_position.z) * still
+	var idle_rot := Vector3(breath * idle_rotation_deg.x, sin(_idle_t * 0.7 + 2.0) * idle_rotation_deg.y,
+			sin(_idle_t * 1.1 + 0.5) * idle_rotation_deg.z) * still
+
 	# Sprint / slide poses.
 	var target_pos := Vector3.ZERO
 	var target_rot := Vector3.ZERO
 	if st == Player.MoveState.SLIDE:
 		target_pos = slide_position
-		target_rot = slide_rotation_deg
+		target_rot = Vector3(slide_rotation_deg.x, slide_rotation_deg.y, slide_rotation_deg.z * player.slide_lean)
 	elif st == Player.MoveState.GROUND and player.is_sprinting and speed > player.run_speed * 0.9:
 		target_pos = sprint_position
 		target_rot = sprint_rotation_deg
@@ -122,9 +139,9 @@ func _process(delta: float) -> void:
 	var motion := lerpf(1.0, ads_motion_scale, ads_blend)
 	var hip := 1.0 - ads_blend
 	_rest_position = _hip_position.lerp(_ads_position, ads_blend)
-	position = _rest_position + _pose_pos * hip + (bob + Vector3(0.0, _vertical - _land, 0.0)) * motion \
+	position = _rest_position + _pose_pos * hip + (bob + idle_pos + Vector3(0.0, _vertical - _land, 0.0)) * motion \
 			+ action_position + Vector3(0.0, 0.0, _kick_back)
-	rotation = _rest_rotation + _sway * motion + _pose_rot * (PI / 180.0) * hip \
+	rotation = _rest_rotation + (_sway + idle_rot * (PI / 180.0)) * motion + _pose_rot * (PI / 180.0) * hip \
 			+ action_rotation_deg * (PI / 180.0) + Vector3(deg_to_rad(_kick_rot), 0.0, 0.0)
 
 

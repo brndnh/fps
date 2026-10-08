@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/ak47.tscn" id="1_vtm0l"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_mtux0"]
+
+[resource]
+script = ExtResource("2_mtux0")
+display_name = "AK-47"
+model_scene = ExtResource("1_vtm0l")
+sound_prefix = "ak47"
+bolt_kick = 0.03
+damage = 19.0
+head_multiplier = 2.0
+falloff_end = 90.0
+mag_size = 30
+reserve_ammo = 90
+reload_time = 2.5
+reload_empty_time = 2.9
+reload_commit = 0.65
+draw_time = 0.85
+quick_draw_time = 0.4
+move_speed = 0.96
+ads_time = 0.23
+hip_spread = 2.1
+move_spread = 1.5
+air_spread = 2.4
+bloom_per_shot = 0.14
+bloom_max = 1.4
+bloom_decay = 4.5
+recoil_pattern = PackedVector2Array(0, 0.58, 0.038542327, 0.58, 0.020620055, 0.58, -0.027510647, 0.58, -0.035338186, 0.58, 0.008604799, 0.58, 0.039941736, 0.58, 0.012763934, 0.58, 0.16688694, 0.32, 0.16952066, 0.32, 0.21680668, 0.32, 0.23947088, 0.32, 0.20431015, 0.32, 0.16283505, 0.32, 0.17580669, 0.32, -0.1957784, 0.16, -0.18284819, 0.16, -0.22434546, 0.16, -0.25947663, 0.16, -0.23677443, 0.16, -0.18949766, 0.16, -0.18690689, 0.16, -0.2327976, 0.16, 0.0800602, 0.16, 0.1114299, 0.16, 0.15535481, 0.16, 0.14748484, 0.16, 0.09934951, 0.16, 0.08146719, 0.16, 0.12003553, 0.16)
+recoil_jitter = 0.07
+view_punch = 0.7
+ads_position = Vector3(0, -0.058, -0.36)
+kick_back = 0.04
+kick_rotation = 3.5
+muzzle_flash_size = 1.1
+throw_damage = 30.0

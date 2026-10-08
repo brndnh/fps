@@ -1,0 +1,149 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://scenes/dust2_mesh.res" id="1_or3o4"]
+[ext_resource type="Shape3D" path="res://scenes/dust2_shape.res" id="2_67lj6"]
+[ext_resource type="PackedScene" path="res://scenes/target.tscn" id="3_twgk3"]
+[ext_resource type="Script" path="res://scripts/target.gd" id="4_pp7ag"]
+[ext_resource type="Script" path="res://scripts/buy_zone.gd" id="5_ohr5t"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="6_iy8r6"]
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="7_jf8wx"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_cnns7"]
+sky_top_color = Color(0.36, 0.55, 0.82, 1)
+sky_horizon_color = Color(0.85, 0.8, 0.72, 1)
+ground_horizon_color = Color(0.85, 0.8, 0.72, 1)
+
+[sub_resource type="Sky" id="Sky_u6glh"]
+sky_material = SubResource("ProceduralSkyMaterial_cnns7")
+
+[sub_resource type="Environment" id="Environment_a6gik"]
+background_mode = 2
+sky = SubResource("Sky_u6glh")
+ambient_light_source = 3
+tonemap_mode = 2
+ssao_enabled = true
+
+[node name="Dust2" type="Node3D" unique_id=864403874]
+metadata/radar_image = "res://textures/dust2_radar.png"
+metadata/radar_rect = Rect2(-53.135, -56.812, 106.5, 114)
+metadata/radar_labels = [["A", 35.823, -39.606], ["B", -32.404, -44.301]]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=596669841]
+environment = SubResource("Environment_a6gik")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1624437104]
+transform = Transform3D(0.81915206, -0.43938506, 0.36868784, 0, 0.64278764, 0.76604444, -0.57357645, -0.62750685, 0.5265408, 0, 0, 0)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 1.2
+shadow_enabled = true
+directional_shadow_max_distance = 150.0
+
+[node name="Geometry" type="Node3D" parent="." unique_id=78801362]
+
+[node name="Level" type="StaticBody3D" parent="Geometry" unique_id=1865252005]
+
+[node name="Mesh" type="MeshInstance3D" parent="Geometry/Level" unique_id=329794252]
+mesh = ExtResource("1_or3o4")
+
+[node name="Shape" type="CollisionShape3D" parent="Geometry/Level" unique_id=774027246]
+shape = ExtResource("2_67lj6")
+
+[node name="Targets" type="Node3D" parent="." unique_id=315510131]
+
+[node name="Target0" type="Node3D" parent="Targets" unique_id=1861572919 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.823, 2.546, -42.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target1" type="Node3D" parent="Targets" unique_id=1472790978 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.823, 1.403, -38.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target2" type="Node3D" parent="Targets" unique_id=1005371584 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.823, -0.014, -34.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target3" type="Node3D" parent="Targets" unique_id=1079828066 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.823, 0.009, -20.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target4" type="Node3D" parent="Targets" unique_id=820391250 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.823, 0.009, -5.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target5" type="Node3D" parent="Targets" unique_id=1812600483 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.971, 0.914, 9.601)
+script = ExtResource("4_pp7ag")
+
+[node name="Target6" type="Node3D" parent="Targets" unique_id=2125407960 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.823, 0.009, -32.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target7" type="Node3D" parent="Targets" unique_id=834672706 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.823, -1.341, -30.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target8" type="Node3D" parent="Targets" unique_id=1443828611 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.286, -3.107, -15.059)
+script = ExtResource("4_pp7ag")
+
+[node name="Target9" type="Node3D" parent="Targets" unique_id=41204937 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.895, 0.914, -0.819)
+script = ExtResource("4_pp7ag")
+
+[node name="Target10" type="Node3D" parent="Targets" unique_id=1225621966 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.177, -3.055, -27.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target11" type="Node3D" parent="Targets" unique_id=596023360 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.823, -2.957, -38.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target12" type="Node3D" parent="Targets" unique_id=1834854442 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.177, 0.229, -42.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target13" type="Node3D" parent="Targets" unique_id=83858243 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -41.177, 2.692, -34.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target14" type="Node3D" parent="Targets" unique_id=480826791 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.308, 0.661, -36.033)
+script = ExtResource("4_pp7ag")
+
+[node name="Target15" type="Node3D" parent="Targets" unique_id=1632906330 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.177, 0.063, -24.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target16" type="Node3D" parent="Targets" unique_id=1943747160 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.177, 0.934, -4.606)
+script = ExtResource("4_pp7ag")
+
+[node name="Target17" type="Node3D" parent="Targets" unique_id=2139933754 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.764, -2.759, -12.106)
+script = ExtResource("4_pp7ag")
+
+[node name="Target18" type="Node3D" parent="Targets" unique_id=2146023395 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.286, 0.076, 16.002)
+script = ExtResource("4_pp7ag")
+
+[node name="Target19" type="Node3D" parent="Targets" unique_id=1381626778 groups=["targets"] instance=ExtResource("3_twgk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.803, 2.032, 8.163)
+script = ExtResource("4_pp7ag")
+
+[node name="BuyZones" type="Node3D" parent="." unique_id=1166775451]
+
+[node name="TSpawn" type="Area3D" parent="BuyZones" unique_id=464697975]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.177, 3.231, 45.394)
+script = ExtResource("5_ohr5t")
+size = Vector3(22, 6, 8)
+
+[node name="CTSpawn" type="Area3D" parent="BuyZones" unique_id=498405126]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.823, 2.515, -32.606)
+script = ExtResource("5_ohr5t")
+size = Vector3(10, 6, 10)
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=72762536 instance=ExtResource("6_iy8r6")]
+transform = Transform3D(0.44150364, 0, -0.8972595, 0, 1, 0, 0.8972595, 0, 0.44150364, -14.177, 3.3309999, 44.394)
+floor_max_angle = 0.907571
+floor_snap_length = 0.35
+script = ExtResource("7_jf8wx")

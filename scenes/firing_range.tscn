@@ -1,4 +1,4 @@
-[gd_scene load_steps=96 format=3]
+[gd_scene load_steps=104 format=3]
 
 [ext_resource type="Material" path="res://materials/grid_dark.tres" id="1_2cfq6"]
 [ext_resource type="Material" path="res://materials/grid_light.tres" id="2_ov3o6"]
@@ -12,6 +12,14 @@
 [ext_resource type="Resource" path="res://weapons/carbine.tres" id="10_carbn"]
 [ext_resource type="Resource" path="res://weapons/smg.tres" id="11_smgun"]
 [ext_resource type="Resource" path="res://weapons/sidearm.tres" id="12_sidea"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="20_shtgn"]
+[ext_resource type="Resource" path="res://weapons/dmr.tres" id="21_dmrfl"]
+[ext_resource type="Resource" path="res://weapons/sniper.tres" id="22_snipr"]
+[ext_resource type="Resource" path="res://weapons/deagle.tres" id="23_deagl"]
+[ext_resource type="Resource" path="res://weapons/revolver.tres" id="24_rvlvr"]
+[ext_resource type="Resource" path="res://weapons/m4.tres" id="25_m4rfl"]
+[ext_resource type="Resource" path="res://weapons/ak47.tres" id="26_ak47r"]
+[ext_resource type="Resource" path="res://weapons/olympia.tres" id="27_olymp"]
 [ext_resource type="Script" path="res://scripts/buy_zone.gd" id="13_buyzn"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jclm5"]
@@ -915,24 +923,64 @@ font_size = 64
 outline_size = 18
 
 [node name="Player" parent="." instance=ExtResource("8_5v360")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 8)
 
 [node name="WeaponRack" type="Node3D" parent="."]
 
 [node name="Carbine" type="Node3D" parent="WeaponRack"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.35, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 11)
 script = ExtResource("9_wspwn")
 weapon = ExtResource("10_carbn")
 
 [node name="SMG" type="Node3D" parent="WeaponRack"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 7)
 script = ExtResource("9_wspwn")
 weapon = ExtResource("11_smgun")
 
 [node name="Sidearm" type="Node3D" parent="WeaponRack"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.35, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 1)
 script = ExtResource("9_wspwn")
 weapon = ExtResource("12_sidea")
+
+[node name="DesertEagle" type="Node3D" parent="WeaponRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 3)
+script = ExtResource("9_wspwn")
+weapon = ExtResource("23_deagl")
+
+[node name="Revolver" type="Node3D" parent="WeaponRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 5)
+script = ExtResource("9_wspwn")
+weapon = ExtResource("24_rvlvr")
+
+[node name="Shotgun" type="Node3D" parent="WeaponRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 9)
+script = ExtResource("9_wspwn")
+weapon = ExtResource("20_shtgn")
+
+[node name="DMR" type="Node3D" parent="WeaponRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 13)
+script = ExtResource("9_wspwn")
+weapon = ExtResource("21_dmrfl")
+
+[node name="Sniper" type="Node3D" parent="WeaponRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 15)
+script = ExtResource("9_wspwn")
+weapon = ExtResource("22_snipr")
+
+[node name="M4A4" type="Node3D" parent="WeaponRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 17)
+script = ExtResource("9_wspwn")
+weapon = ExtResource("25_m4rfl")
+
+[node name="AK47" type="Node3D" parent="WeaponRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 19)
+script = ExtResource("9_wspwn")
+weapon = ExtResource("26_ak47r")
+
+[node name="Olympia" type="Node3D" parent="WeaponRack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.3, 1.35, 21)
+script = ExtResource("9_wspwn")
+weapon = ExtResource("27_olymp")
 
 [node name="BuyZones" type="Node3D" parent="."]
 
@@ -940,6 +988,7 @@ weapon = ExtResource("12_sidea")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
 script = ExtResource("13_buyzn")
 size = Vector3(24, 4, 9)
+flip_label = true
 
 [node name="Course" type="Area3D" parent="BuyZones"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0, 30)

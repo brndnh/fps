@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/shotgun.tscn" id="1_yi04f"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_5rhaf"]
+
+[resource]
+script = ExtResource("2_5rhaf")
+display_name = "Shotgun"
+model_scene = ExtResource("1_yi04f")
+sound_prefix = "shotgun"
+bolt_node = NodePath("Pivot/Gun/Pump")
+bolt_kick = 0.0
+fire_mode = 1
+rpm = 70.0
+damage = 11.0
+head_multiplier = 1.5
+pellets = 8
+pellet_spread = 5.0
+pellet_spread_ads = 3.2
+cycle_after_shot = true
+falloff_start = 8.0
+falloff_end = 22.0
+falloff_min = 0.35
+mag_size = 6
+reserve_ammo = 32
+shell_reload = true
+reload_end_time = 0.42
+draw_time = 0.6
+quick_draw_time = 0.4
+holster_time = 0.22
+ads_time = 0.2
+ads_zoom = 1.1
+ads_move_speed = 0.65
+sprint_to_fire_time = 0.2
+hip_spread = 0.4
+move_spread = 0.6
+air_spread = 1.0
+bloom_per_shot = 0.0
+bloom_max = 0.0
+recoil_pattern = PackedVector2Array(0.25, 2.6, -0.2, 2.6, 0.25, 2.6, -0.2, 2.6, 0.25, 2.6, -0.2, 2.6)
+recoil_jitter = 0.25
+recoil_recovery = 16.0
+view_punch = 2.2
+hip_position = Vector3(0.18, -0.19, -0.5)
+ads_position = Vector3(0, -0.046, -0.36)
+kick_back = 0.06
+kick_rotation = 8.0
+muzzle_flash_size = 1.6
+throw_damage = 30.0

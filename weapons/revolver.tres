@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/revolver.tscn" id="1_7o2kd"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_vjb0u"]
+
+[resource]
+script = ExtResource("2_vjb0u")
+display_name = "R8 Revolver"
+model_scene = ExtResource("1_7o2kd")
+sound_prefix = "revolver"
+bolt_node = NodePath("")
+bolt_kick = 0.0
+rpm = 110.0
+damage = 72.0
+head_multiplier = 2.0
+cycle_after_shot = true
+prime_time = 0.32
+falloff_end = 90.0
+mag_size = 8
+reserve_ammo = 40
+reload_time = 2.5
+reload_empty_time = 2.5
+reload_commit = 0.72
+draw_time = 0.7
+quick_draw_time = 0.3
+move_speed = 1.04
+holster_time = 0.2
+ads_time = 0.2
+ads_move_speed = 0.75
+sprint_to_fire_time = 0.18
+hip_spread = 0.7
+move_spread = 1.4
+air_spread = 2.2
+bloom_per_shot = 0.4
+bloom_max = 1.6
+bloom_decay = 3.0
+recoil_pattern = PackedVector2Array(0.12, 2.4, -0.1, 2.4, 0.12, 2.4, -0.1, 2.4, 0.12, 2.4, -0.1, 2.4, 0.12, 2.4, -0.1, 2.4)
+recoil_jitter = 0.25
+recoil_recovery = 12.0
+view_punch = 1.6
+hip_position = Vector3(0.15, -0.17, -0.42)
+ads_position = Vector3(0, -0.052, -0.34)
+kick_back = 0.06
+kick_rotation = 10.0
+muzzle_flash_size = 1.4

@@ -6,6 +6,7 @@ const COLOR := Color(0.35, 1.0, 0.45)
 
 @export var size: Vector3 = Vector3(10, 4, 10)
 @export var label: String = "BUY ZONE"
+@export var flip_label: bool = false ## The floor text reads facing -Z; flip it to read facing +Z.
 
 
 func _ready() -> void:
@@ -64,6 +65,6 @@ func _build_marking() -> void:
 	l.pixel_size = 0.01
 	l.modulate = Color(COLOR, 0.35)
 	l.outline_size = 0
-	l.rotation_degrees = Vector3(-90, 0, 0)
+	l.rotation_degrees = Vector3(-90, 180 if flip_label else 0, 0)
 	l.position = Vector3(0, 0.025, size.z * 0.5 - 1.0)
 	add_child(l)

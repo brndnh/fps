@@ -28,6 +28,7 @@ enum MoveState { GROUND, AIR, SLIDE }
 @export_group("Air")
 @export var gravity: float = 19.0
 @export var jump_height: float = 1.1
+@export var step_height: float = 0.45 ## Walks straight up ledges this high (curbs, door sills, stairs), like Source's 18 units.
 @export var air_accel: float = 14.0
 @export var air_speed_cap: float = 1.3 ## Low cap = Source-style air strafing. Raise for more air control.
 @export var coyote_time: float = 0.1
@@ -53,7 +54,8 @@ enum MoveState { GROUND, AIR, SLIDE }
 @export_group("Camera FX")
 @export var speed_fov_kick: float = 8.0
 @export var fov_kick_full_speed: float = 16.0
-@export var slide_tilt_deg: float = 4.0
+@export var slide_tilt_deg: float = 4.0 ## Camera roll at full lean: leans the way the slide is carrying you sideways.
+@export var slide_lean_full: float = 0.5 ## Sideways share of the slide speed that counts as full lean (0.5 = sliding 30 degrees off where you look).
 @export var land_dip_scale: float = 0.012
 @export var view_punch_return: float = 18.0
 
@@ -89,6 +91,9 @@ var move_speed_multiplier: float = 1.0 ## ADS slowdown (doesn't affect sprint).
 var weapon_speed_multiplier: float = 1.0 ## Weapon in hand, e.g. knife out = faster (affects sprint).
 var zoom: float = 1.0
 var ads_amount: float = 0.0
+## -1..1 while sliding: which way the slide carries you relative to where you look
+## (+ = right). 0 sliding straight ahead or when not sliding. Smoothed.
+var slide_lean: float = 0.0
 
 
 func _ready() -> void:
@@ -157,7 +162,37 @@ func _physics_process(delta: float) -> void:
 
 	_clamp_speed()
 	_update_crouch(crouch_held)
+	if state != MoveState.AIR and not jump_now:
+		_step_up(delta)
 	move_and_slide()
+
+
+## If this tick's move runs into a low ledge, lift the player onto it first: try the
+## move raised by step_height, and if that's clear, set down on top of the ledge.
+func _step_up(delta: float) -> void:
+	var motion := Vector3(velocity.x, 0.0, velocity.z) * delta
+	if motion.length() < 0.0005:
+		return
+	var from := global_transform
+	if not test_move(from, motion):
+		return # Nothing in the way.
+	var up := Vector3.UP * step_height
+	if test_move(from, up):
+		return # Ceiling.
+	var raised := from.translated(up)
+	# Reach a little further than this tick's move, so it catches the edge before the wall stops us.
+	var ahead := motion.normalized() * maxf(motion.length(), 0.08)
+	if test_move(raised, ahead):
+		return # Still blocked up there: a wall, not a step.
+	var hit := KinematicCollision3D.new()
+	if not test_move(raised.translated(ahead), -up, hit):
+		return # Nothing to stand on.
+	if hit.get_normal().angle_to(Vector3.UP) > floor_max_angle:
+		return
+	var rise := step_height - hit.get_travel().length()
+	if rise < 0.02:
+		return
+	global_position.y += rise + 0.01
 
 
 func _process(delta: float) -> void:
@@ -176,8 +211,12 @@ func _process(delta: float) -> void:
 	_view_punch = _view_punch.lerp(Vector2.ZERO, 1.0 - exp(-view_punch_return * delta))
 	camera.rotation.x = _view_punch.x
 	camera.rotation.y = _view_punch.y
-	var tilt := deg_to_rad(slide_tilt_deg) if state == MoveState.SLIDE else 0.0
-	camera.rotation.z = lerpf(camera.rotation.z, tilt, 1.0 - exp(-10.0 * delta))
+	var lean := 0.0
+	if state == MoveState.SLIDE:
+		var side := get_local_velocity().x / maxf(get_horizontal_speed(), 1.0)
+		lean = clampf(side / maxf(slide_lean_full, 0.01), -1.0, 1.0)
+	slide_lean = lerpf(slide_lean, lean, 1.0 - exp(-8.0 * delta))
+	camera.rotation.z = lerpf(camera.rotation.z, -deg_to_rad(slide_tilt_deg) * slide_lean, 1.0 - exp(-10.0 * delta))
 
 
 # --- Movement per state -----------------------------------------------------

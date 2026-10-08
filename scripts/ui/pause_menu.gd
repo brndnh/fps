@@ -4,9 +4,12 @@ extends CanvasLayer
 
 const ACCENT := Color(0.35, 1.0, 0.45)
 
+const MAPS := [["Dust II", "res://scenes/dust2.tscn"], ["Firing Range", "res://scenes/firing_range.tscn"]]
+
 var _root: Control
 var _main_panel: Control
 var _settings_panel: Control
+var _maps_panel: Control
 var _sens_slider: HSlider
 var _sens_spin: SpinBox
 var _invert_check: CheckButton
@@ -49,14 +52,28 @@ func resume() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
+## Switches map (the run starts on Dust II; see run/main_scene in project.godot).
+func _load_map(path: String) -> void:
+	resume()
+	get_tree().change_scene_to_file(path)
+
+
 func _show_main() -> void:
 	_cancel_listen()
 	_main_panel.visible = true
 	_settings_panel.visible = false
+	_maps_panel.visible = false
+
+
+func _show_maps() -> void:
+	_main_panel.visible = false
+	_settings_panel.visible = false
+	_maps_panel.visible = true
 
 
 func _show_settings() -> void:
 	_main_panel.visible = false
+	_maps_panel.visible = false
 	_settings_panel.visible = true
 
 
@@ -67,6 +84,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif _settings_panel.visible:
 			_show_main()
 		else:
+			resume()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("map_menu") and not _listening:
+		if not visible:
+			open()
+			_show_maps()
+		elif _maps_panel.visible:
 			resume()
 		get_viewport().set_input_as_handled()
 	elif not visible and event is InputEventMouseButton and event.pressed \
@@ -170,7 +194,17 @@ func _build_ui() -> void:
 	_title(mv, "PAUSED")
 	_button(mv, "Resume", resume)
 	_button(mv, "Settings", _show_settings)
+	_button(mv, "Maps", _show_maps)
 	_button(mv, "Quit", func() -> void: get_tree().quit())
+
+	# Maps panel (also straight from the Maps key, M)
+	_maps_panel = _panel(Vector2(360, 0))
+	center.add_child(_maps_panel)
+	var mp := _vbox(_maps_panel, 12)
+	_title(mp, "MAPS")
+	for m: Array in MAPS:
+		_button(mp, m[0], _load_map.bind(m[1]))
+	_button(mp, "Back", _show_main)
 
 	# Settings panel
 	_settings_panel = _panel(Vector2(780, 660))

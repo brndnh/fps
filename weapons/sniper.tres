@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/sniper.tscn" id="1_fkq78"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_i7fen"]
+
+[resource]
+script = ExtResource("2_i7fen")
+display_name = "Sniper"
+model_scene = ExtResource("1_fkq78")
+sound_prefix = "sniper"
+bolt_kick = 0.0
+fire_mode = 1
+rpm = 40.0
+damage = 135.0
+head_multiplier = 2.0
+cycle_after_shot = true
+unscope_on_shot = true
+falloff_start = 300.0
+falloff_end = 400.0
+falloff_min = 1.0
+mag_size = 5
+reserve_ammo = 30
+reload_time = 3.2
+reload_empty_time = 3.8
+draw_time = 0.85
+quick_draw_time = 0.55
+move_speed = 0.9
+holster_time = 0.3
+ads_time = 0.3
+ads_zoom = 7.0
+ads_move_speed = 0.4
+sprint_to_fire_time = 0.3
+scope_overlay = true
+hip_spread = 7.0
+move_spread = 3.0
+ads_move_spread = 3.0
+air_spread = 6.0
+bloom_per_shot = 0.0
+bloom_max = 0.0
+recoil_pattern = PackedVector2Array(0.2, 3.2)
+recoil_scale_ads = 0.7
+recoil_jitter = 0.3
+recoil_recovery = 14.0
+view_punch = 3.0
+hip_position = Vector3(0.19, -0.21, -0.52)
+ads_position = Vector3(0, -0.075, -0.3)
+kick_back = 0.07
+kick_rotation = 9.0
+muzzle_flash_size = 1.7
+throw_damage = 35.0

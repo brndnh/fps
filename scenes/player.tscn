@@ -17,7 +17,7 @@ radius = 0.4
 height = 1.8
 
 [node name="Player" type="CharacterBody3D" unique_id=72762536]
-floor_max_angle = 0.80285144
+floor_max_angle = 0.907571
 floor_snap_length = 0.35
 script = ExtResource("1_smehm")
 
@@ -51,9 +51,9 @@ script = ExtResource("8_oprun")
 
 [node name="Stats" type="Label" parent="DebugHUD" unique_id=2029796086]
 offset_left = 20.0
-offset_top = 16.0
+offset_top = 262.0
 offset_right = 20.0
-offset_bottom = 16.0
+offset_bottom = 262.0
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5

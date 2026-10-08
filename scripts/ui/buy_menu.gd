@@ -22,9 +22,12 @@ func _ready() -> void:
 	_weapons = get_parent().get_node_or_null("Weapons")
 	var knives: Array = Settings.KNIVES.map(func(k: Array) -> WeaponData: return load(k[2]))
 	_categories = [
-		{name = "Pistols", items = [load("res://weapons/sidearm.tres")]},
+		{name = "Pistols", items = [load("res://weapons/sidearm.tres"), load("res://weapons/deagle.tres"),
+				load("res://weapons/revolver.tres")]},
 		{name = "SMGs", items = [load("res://weapons/smg.tres")]},
-		{name = "Rifles", items = [load("res://weapons/carbine.tres")]},
+		{name = "Heavy", items = [load("res://weapons/shotgun.tres"), load("res://weapons/olympia.tres")]},
+		{name = "Rifles", items = [load("res://weapons/carbine.tres"), load("res://weapons/m4.tres"),
+				load("res://weapons/ak47.tres"), load("res://weapons/dmr.tres"), load("res://weapons/sniper.tres")]},
 		{name = "Knives", items = knives},
 	]
 	_wheel = Control.new()
@@ -150,9 +153,20 @@ func _draw_wheel() -> void:
 		var item: WeaponData = _categories[_category].items[i] if _category >= 0 else null
 		var owned := item != null and _weapons.owns(item)
 		var p := c + Vector2.from_angle(mid) * mid_r
-		_text(font, p, "%d  %s" % [i + 1, String(labels[i]).to_upper()], 18, ACCENT if owned else Color.WHITE)
+		# Busy wheels (the knives) get smaller labels, with long names wrapped onto two lines.
+		var font_size := 18 if n <= 6 else 13
+		var label := String(labels[i]).to_upper()
+		var lines := [label]
+		if n > 6 and label.contains(" "):
+			var cut := label.rfind(" ")
+			lines = [label.substr(0, cut), label.substr(cut + 1)]
+		var top := p - Vector2(0, (lines.size() - 1) * font_size * 0.6)
+		for li in lines.size():
+			var line: String = ("%d  " % (i + 1) if li == 0 and i < 9 else "") + String(lines[li])
+			_text(font, top + Vector2(0, li * font_size * 1.2), line, font_size, ACCENT if owned else Color.WHITE)
 		if owned:
-			_text(font, p + Vector2(0, 22), "EQUIPPED" if item.is_melee else "OWNED · REFILL", 12, Color(ACCENT, 0.8))
+			_text(font, top + Vector2(0, lines.size() * font_size * 1.2 + 4), "EQUIPPED" if item.is_melee else "OWNED · REFILL",
+					11 if n > 6 else 12, Color(ACCENT, 0.8))
 
 	_wheel.draw_circle(c, INNER - 8.0, Color(0.05, 0.06, 0.07, 0.9))
 	var title := "BUY" if _category < 0 else String(_categories[_category].name).to_upper()

@@ -1,6 +1,6 @@
 extends CanvasLayer
-## Ammo counter, weapon slots, reload bar and pickup prompt. Built in code;
-## reads the WeaponManager every frame.
+## Ammo counter, weapon slots, reload bar, pickup prompt, the sniper scope and the radar.
+## Built in code; reads the WeaponManager every frame.
 
 const ACCENT := Color(0.35, 1.0, 0.45)
 const LOW_AMMO := Color(1.0, 0.35, 0.3)
@@ -17,6 +17,7 @@ var _buy: Label
 var _ammo_row: HBoxContainer
 var _bar_bg: ColorRect
 var _bar_fill: ColorRect
+var _scope: Control
 
 
 func _ready() -> void:
@@ -28,6 +29,10 @@ func _process(_delta: float) -> void:
 	if _weapons == null or not _weapons.is_physics_processing():
 		return
 	var d := _weapons.data()
+	var scoped := _weapons.is_scoped()
+	if scoped != _scope.visible:
+		_scope.visible = scoped
+		_scope.queue_redraw()
 	var selected := _weapons.get_selected_slot()
 	var names := _weapons.get_slot_names()
 	for i in _slots.size():
@@ -59,7 +64,7 @@ func _process(_delta: float) -> void:
 	var reloading := _weapons.is_reloading()
 	_bar_bg.visible = reloading
 	if reloading:
-		_bar_fill.size.x = _bar_bg.size.x * _weapons.get_action_progress()
+		_bar_fill.size.x = _bar_bg.size.x * _weapons.get_reload_progress()
 	_hint.visible = low and not reloading
 	_hint.text = "NO AMMO" if mag == 0 else "RELOAD  [%s]" % Settings.event_label(Settings.get_binding("reload", 0))
 
@@ -69,6 +74,17 @@ func _build() -> void:
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
+
+	# Scope first, so the ammo and prompts draw over it.
+	_scope = Control.new()
+	_scope.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_scope.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_scope.visible = false
+	_scope.draw.connect(_draw_scope)
+	_scope.resized.connect(_scope.queue_redraw)
+	root.add_child(_scope)
+
+	root.add_child(Radar.new())
 
 	var box := VBoxContainer.new()
 	box.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -138,6 +154,24 @@ func _build() -> void:
 	_prompt.size = Vector2(400, 30)
 	_prompt.position = Vector2(-200, 90)
 	root.add_child(_prompt)
+
+
+## Full-screen scope: black outside a circle, fine crosshair that thickens toward the edge.
+func _draw_scope() -> void:
+	var size := _scope.size
+	var c := size * 0.5
+	var r := size.y * 0.46
+	var black := Color(0, 0, 0)
+	var cover := size.length() # Thick enough to reach every corner.
+	_scope.draw_arc(c, r + cover * 0.5, 0.0, TAU, 128, black, cover)
+	_scope.draw_arc(c, r, 0.0, TAU, 128, Color(0, 0, 0, 0.6), 6.0)
+	var line := Color(0, 0, 0, 0.9)
+	_scope.draw_line(Vector2(c.x - r, c.y), Vector2(c.x + r, c.y), line, 1.0)
+	_scope.draw_line(Vector2(c.x, c.y - r), Vector2(c.x, c.y + r), line, 1.0)
+	var thick := r * 0.55
+	for dir: Vector2 in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
+		_scope.draw_line(c + dir * thick, c + dir * r, black, 4.0)
+	_scope.draw_circle(c, 1.5, Color(1.0, 0.25, 0.2))
 
 
 func _label(text: String, font_size: int) -> Label:

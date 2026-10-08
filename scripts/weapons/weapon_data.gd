@@ -3,7 +3,8 @@ extends Resource
 ## Stats for one weapon. Each weapon is a .tres in weapons/, so you can tune it
 ## in the Inspector while the game is running.
 ## The viewmodel scene's AnimationPlayer holds the keyframed animations:
-## guns use draw, draw_quick, inspect, reload, reload_empty, melee_lower and idle;
+## guns use draw, draw_quick, inspect, reload, reload_empty, melee_lower and idle
+## (plus "cycle" with cycle_after_shot, and reload_start/reload_shell/reload_end with shell_reload);
 ## melee weapons use draw, draw_quick, inspect, slash_left, slash_right, heavy, quick_slash and idle.
 ## Draws take turns each time you pull the weapon out: "draw" (flourish), "draw_quick",
 ## then any other "draw*" animation you add.
@@ -22,6 +23,12 @@ enum FireMode { AUTO, SEMI }
 @export var rpm: float = 600.0
 @export var damage: float = 14.0
 @export var head_multiplier: float = 1.75
+@export var pellets: int = 1 ## Shotguns: bullets per shot, each doing `damage`.
+@export var pellet_spread: float = 0.0 ## Degrees (cone radius) the pellets fan out around the aim point.
+@export var pellet_spread_ads: float = 0.0 ## The same, fully aimed.
+@export var cycle_after_shot: bool = false ## Plays "cycle" (pump / bolt) after every shot that leaves a round in the mag.
+@export var prime_time: float = 0.0 ## Revolver (R8 style): hold fire this long to cock the hammer and it fires; keep holding to keep firing. Let go early and it eases back down.
+@export var unscope_on_shot: bool = false ## Drops out of ADS until the next shot is ready, then aims back in if you still are (AWP style).
 @export var falloff_start: float = 40.0 ## Metres. Full damage up to here.
 @export var falloff_end: float = 80.0
 @export var falloff_min: float = 0.7 ## Damage fraction at falloff_end and beyond.
@@ -32,21 +39,27 @@ enum FireMode { AUTO, SEMI }
 @export var reload_time: float = 2.4 ## Mag still has rounds.
 @export var reload_empty_time: float = 3.1 ## Mag was empty (also chambers a round).
 @export_range(0.0, 1.0) var reload_commit: float = 0.7 ## Ammo goes in at this fraction of the reload. Cancel before it and you get nothing.
+@export var shell_reload: bool = false ## One round at a time: reload_start, reload_shell per round, reload_end. Pulling the trigger finishes the shell going in, closes up, then fires.
+@export var reload_start_time: float = 0.4
+@export var shell_time: float = 0.5 ## Per round. The round goes in at reload_commit of this.
+@export var reload_end_time: float = 0.4
 
 @export_group("Handling")
-@export var draw_time: float = 0.45 ## Flourish draws: when you can shoot. The flourish keeps playing until you act.
-@export var quick_draw_time: float = 0.35 ## The "draw_quick" animation.
+@export var draw_time: float = 0.45 ## Flourish draws: the soonest you can shoot. You always wait for the whole draw animation.
+@export var quick_draw_time: float = 0.35 ## The same for the "draw_quick" animation.
 @export var move_speed: float = 1.0 ## Movement speed multiplier while this is in your hands (sprint included).
 @export var holster_time: float = 0.25
 @export var ads_time: float = 0.22 ## Seconds to fully aim in.
 @export var ads_zoom: float = 1.15 ## FOV zoom while aiming (1 = none).
 @export var ads_move_speed: float = 0.55 ## Movement speed multiplier while fully aimed.
 @export var sprint_to_fire_time: float = 0.22 ## Delay after sprinting before you can shoot.
+@export var scope_overlay: bool = false ## Fully aimed: the viewmodel hides and the HUD draws a full-screen scope.
 
 @export_group("Accuracy")
 @export var hip_spread: float = 2.0 ## Degrees (cone radius) when standing still.
 @export var ads_spread: float = 0.0 ## 0 = perfectly accurate when aimed.
 @export var move_spread: float = 1.2 ## Added at sprint speed (hipfire only).
+@export var ads_move_spread: float = 0.0 ## Added at sprint speed while aimed (snipers punish moving while scoped).
 @export var air_spread: float = 2.0 ## Added while airborne (hipfire only).
 @export var bloom_per_shot: float = 0.12 ## Hipfire spread grows while you hold fire.
 @export var bloom_max: float = 1.2
@@ -67,6 +80,7 @@ enum FireMode { AUTO, SEMI }
 @export var kick_back: float = 0.035 ## Metres the gun pushes back per shot.
 @export var kick_rotation: float = 3.0 ## Degrees the muzzle flips up per shot.
 @export var muzzle_flash_size: float = 1.0
+@export var ads_flash_scale: float = 0.3 ## Muzzle flash size fully aimed, so it doesn't block the sight picture.
 
 @export_group("Melee")
 @export var light_damage: float = 30.0
