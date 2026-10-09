@@ -25,9 +25,9 @@ func _ready() -> void:
 		{name = "Pistols", items = [load("res://weapons/sidearm.tres"), load("res://weapons/deagle.tres"),
 				load("res://weapons/revolver.tres")]},
 		{name = "SMGs", items = [load("res://weapons/smg.tres")]},
-		{name = "Heavy", items = [load("res://weapons/shotgun.tres"), load("res://weapons/olympia.tres")]},
-		{name = "Rifles", items = [load("res://weapons/carbine.tres"), load("res://weapons/m4.tres"),
-				load("res://weapons/ak47.tres"), load("res://weapons/dmr.tres"), load("res://weapons/sniper.tres")]},
+		{name = "Heavy", items = [load("res://weapons/shotgun.tres"), load("res://weapons/olympia.tres"), load("res://weapons/negev.tres")]},
+		{name = "Rifles", items = [load("res://weapons/carbine.tres"), load("res://weapons/m4.tres"), load("res://weapons/ak47.tres")]},
+		{name = "Snipers", items = [load("res://weapons/dmr.tres"), load("res://weapons/ssg.tres"), load("res://weapons/sniper.tres")]},
 		{name = "Knives", items = knives},
 	]
 	_wheel = Control.new()
@@ -100,7 +100,6 @@ func _set_open(on: bool) -> void:
 	if on:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		get_viewport().warp_mouse(get_viewport().get_visible_rect().size * 0.5)
-		Sfx.play("swap", -12.0)
 	elif not get_tree().paused:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 

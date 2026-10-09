@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_lvfa7")
-display_name = "SMG"
+display_name = "Hornet"
 model_scene = ExtResource("1_kmdsm")
 sound_prefix = "smg"
 bolt_kick = 0.018
@@ -16,7 +16,7 @@ falloff_start = 20.0
 falloff_end = 50.0
 falloff_min = 0.6
 mag_size = 22
-reserve_ammo = 220
+ammo_type = "light"
 reload_time = 1.8
 reload_empty_time = 2.4
 draw_time = 0.5

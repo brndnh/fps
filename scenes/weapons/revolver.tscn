@@ -50,10 +50,10 @@ rings = 1
 size = Vector3(0.026, 0.026, 0.03)
 
 [sub_resource type="BoxMesh" id="BoxMesh_6s7fb"]
-size = Vector3(0.07, 0.085, 0.08)
+size = Vector3(0.06, 0.075, 0.08)
 
 [sub_resource type="BoxMesh" id="BoxMesh_afxkh"]
-size = Vector3(0.06, 0.075, 0.08)
+size = Vector3(0.07, 0.085, 0.08)
 
 [sub_resource type="BoxMesh" id="BoxMesh_0iog4"]
 size = Vector3(0.075, 0.075, 1)
@@ -159,6 +159,20 @@ tracks/11/path = NodePath("Pivot/Gun/Crane/Cylinder/Speedloader")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/12/type = "position_3d"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Pivot/Arms/LeftArm")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/13/type = "position_3d"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Pivot/Arms/RightArm")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = PackedFloat32Array(0, 1, 0, 0, 0)
 
 [sub_resource type="Animation" id="Animation_ss7lc"]
 length = 0.8
@@ -246,13 +260,27 @@ tracks/11/path = NodePath("Pivot/Gun/Crane/Cylinder/Speedloader")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
-tracks/12/type = "method"
+tracks/12/type = "position_3d"
 tracks/12/imported = false
 tracks/12/enabled = true
-tracks/12/path = NodePath(".")
+tracks/12/path = NodePath("Pivot/Arms/LeftArm")
 tracks/12/interp = 1
 tracks/12/loop_wrap = true
-tracks/12/keys = {
+tracks/12/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/13/type = "position_3d"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Pivot/Arms/RightArm")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
 "times": PackedFloat32Array(0.45, 0.58),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
@@ -350,9 +378,22 @@ tracks/11/path = NodePath("Pivot/Gun/Crane/Cylinder/Speedloader")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/12/type = "position_3d"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Pivot/Arms/LeftArm")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/13/type = "position_3d"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Pivot/Arms/RightArm")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = PackedFloat32Array(0, 1, 0, 0, 0)
 
 [sub_resource type="Animation" id="Animation_u5kgs"]
-length = 0.05
 tracks/0/type = "position_3d"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -437,6 +478,20 @@ tracks/11/path = NodePath("Pivot/Gun/Crane/Cylinder/Speedloader")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/12/type = "position_3d"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Pivot/Arms/LeftArm")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/13/type = "position_3d"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Pivot/Arms/RightArm")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = PackedFloat32Array(0, 1, 0, 0, 0)
 
 [sub_resource type="Animation" id="Animation_5lwvl"]
 length = 3.0
@@ -524,13 +579,27 @@ tracks/11/path = NodePath("Pivot/Gun/Crane/Cylinder/Speedloader")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
-tracks/12/type = "method"
+tracks/12/type = "position_3d"
 tracks/12/imported = false
 tracks/12/enabled = true
-tracks/12/path = NodePath(".")
+tracks/12/path = NodePath("Pivot/Arms/LeftArm")
 tracks/12/interp = 1
 tracks/12/loop_wrap = true
-tracks/12/keys = {
+tracks/12/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/13/type = "position_3d"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Pivot/Arms/RightArm")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
 "times": PackedFloat32Array(0.6, 0.8, 2.1),
 "transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
@@ -631,6 +700,20 @@ tracks/11/path = NodePath("Pivot/Gun/Crane/Cylinder/Speedloader")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/12/type = "position_3d"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Pivot/Arms/LeftArm")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/13/type = "position_3d"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Pivot/Arms/RightArm")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = PackedFloat32Array(0, 1, 0, 0, 0)
 
 [sub_resource type="Animation" id="Animation_wgx4h"]
 length = 0.32
@@ -718,6 +801,20 @@ tracks/11/path = NodePath("Pivot/Gun/Crane/Cylinder/Speedloader")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
+tracks/12/type = "position_3d"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Pivot/Arms/LeftArm")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/13/type = "position_3d"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Pivot/Arms/RightArm")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = PackedFloat32Array(0, 1, 0, 0, 0)
 
 [sub_resource type="Animation" id="Animation_44spm"]
 length = 2.5
@@ -805,13 +902,27 @@ tracks/11/path = NodePath("Pivot/Gun/Crane/Cylinder/Speedloader")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
-tracks/12/type = "method"
+tracks/12/type = "position_3d"
 tracks/12/imported = false
 tracks/12/enabled = true
-tracks/12/path = NodePath(".")
+tracks/12/path = NodePath("Pivot/Arms/LeftArm")
 tracks/12/interp = 1
 tracks/12/loop_wrap = true
-tracks/12/keys = {
+tracks/12/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/13/type = "position_3d"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Pivot/Arms/RightArm")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
 "times": PackedFloat32Array(0.42, 0.75, 1.7, 1.95),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "values": [{
@@ -915,13 +1026,27 @@ tracks/11/path = NodePath("Pivot/Gun/Crane/Cylinder/Speedloader")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
-tracks/12/type = "method"
+tracks/12/type = "position_3d"
 tracks/12/imported = false
 tracks/12/enabled = true
-tracks/12/path = NodePath(".")
+tracks/12/path = NodePath("Pivot/Arms/LeftArm")
 tracks/12/interp = 1
 tracks/12/loop_wrap = true
-tracks/12/keys = {
+tracks/12/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/13/type = "position_3d"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Pivot/Arms/RightArm")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
 "times": PackedFloat32Array(0.42, 0.75, 1.7, 1.95),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "values": [{
@@ -952,156 +1077,161 @@ _data = {
 &"reload_empty": SubResource("Animation_m6v4n")
 }
 
-[node name="Revolver" type="Node3D" unique_id=1498088243]
+[node name="Revolver" type="Node3D" unique_id=1471874872]
 script = ExtResource("1_4d2n8")
+metadata/punch_scale = 0.9
 
-[node name="Pivot" type="Node3D" parent="." unique_id=181564728]
+[node name="Pivot" type="Node3D" parent="." unique_id=1423929267]
 
-[node name="Gun" type="Node3D" parent="Pivot" unique_id=1452641020]
+[node name="Gun" type="Node3D" parent="Pivot" unique_id=1490411462]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.035, 0)
 
-[node name="Frame" type="MeshInstance3D" parent="Pivot/Gun" unique_id=379018953]
+[node name="Frame" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1734200159]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
 material_override = ExtResource("2_uwxth")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_mncql")
 
-[node name="Barrel" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1811350645]
+[node name="Barrel" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1274028100]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, -0.13)
 material_override = ExtResource("3_4vrqk")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_gjuct")
 
-[node name="Rib" type="MeshInstance3D" parent="Pivot/Gun" unique_id=931412280]
+[node name="Rib" type="MeshInstance3D" parent="Pivot/Gun" unique_id=59064318]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.13)
 material_override = ExtResource("2_uwxth")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_lsw2i")
 
-[node name="UnderLug" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1194559246]
+[node name="UnderLug" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1509845030]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, -0.12)
 material_override = ExtResource("2_uwxth")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_hxgip")
 
-[node name="Grip" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1671832073]
+[node name="Grip" type="MeshInstance3D" parent="Pivot/Gun" unique_id=514529952]
 transform = Transform3D(1, 0, 0, 0, 0.95105654, 0.309017, 0, -0.309017, 0.95105654, 0, -0.035, 0.055)
 material_override = ExtResource("4_xbswl")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_mnvom")
 
-[node name="TriggerGuard" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1334229345]
+[node name="TriggerGuard" type="MeshInstance3D" parent="Pivot/Gun" unique_id=445413754]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005000001, -0.005)
 material_override = ExtResource("2_uwxth")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_cutar")
 
-[node name="RearSightL" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1088970450]
+[node name="RearSightL" type="MeshInstance3D" parent="Pivot/Gun" unique_id=146611307]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.008, 0.085, 0.045)
 material_override = ExtResource("2_uwxth")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_44pv2")
 
-[node name="RearSightR" type="MeshInstance3D" parent="Pivot/Gun" unique_id=92924109]
+[node name="RearSightR" type="MeshInstance3D" parent="Pivot/Gun" unique_id=2095816346]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.008, 0.085, 0.045)
 material_override = ExtResource("2_uwxth")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_eno1h")
 
-[node name="FrontSightDot" type="MeshInstance3D" parent="Pivot/Gun" unique_id=751194681]
+[node name="FrontSightDot" type="MeshInstance3D" parent="Pivot/Gun" unique_id=1504163518]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.087, -0.195)
 material_override = ExtResource("5_x7leg")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_7lypb")
 
-[node name="Hammer" type="Node3D" parent="Pivot/Gun" unique_id=824444593]
+[node name="Hammer" type="Node3D" parent="Pivot/Gun" unique_id=302678255]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, 0.05)
 
-[node name="Mesh" type="MeshInstance3D" parent="Pivot/Gun/Hammer" unique_id=1316555597]
+[node name="Mesh" type="MeshInstance3D" parent="Pivot/Gun/Hammer" unique_id=1092311573]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.004)
 material_override = ExtResource("2_uwxth")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_ou1p3")
 
-[node name="Crane" type="Node3D" parent="Pivot/Gun" unique_id=1201334137]
+[node name="Crane" type="Node3D" parent="Pivot/Gun" unique_id=396786430]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.014, 0.035, -0.03)
 
-[node name="Cylinder" type="Node3D" parent="Pivot/Gun/Crane" unique_id=1387059304]
+[node name="Cylinder" type="Node3D" parent="Pivot/Gun/Crane" unique_id=414731980]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.014, 0.026, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="Pivot/Gun/Crane/Cylinder" unique_id=1767702254]
+[node name="Mesh" type="MeshInstance3D" parent="Pivot/Gun/Crane/Cylinder" unique_id=198489023]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = ExtResource("3_4vrqk")
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_um1ov")
 
-[node name="Speedloader" type="MeshInstance3D" parent="Pivot/Gun/Crane/Cylinder" unique_id=1375223117]
+[node name="Speedloader" type="MeshInstance3D" parent="Pivot/Gun/Crane/Cylinder" unique_id=1539288059]
 material_override = ExtResource("6_wd8iu")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_brjjw")
 
-[node name="Muzzle" type="Marker3D" parent="Pivot/Gun" unique_id=366874380]
+[node name="Muzzle" type="Marker3D" parent="Pivot/Gun" unique_id=1702624707]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, -0.21)
 
-[node name="Arms" type="Node3D" parent="Pivot" unique_id=675613061]
+[node name="Arms" type="Node3D" parent="Pivot" unique_id=468281457]
 
-[node name="RightHand" type="MeshInstance3D" parent="Pivot/Arms" unique_id=1267262207]
-transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0.005, -0.075, 0.075)
+[node name="LeftArm" type="Node3D" parent="Pivot/Arms" unique_id=1859730062]
+
+[node name="LeftHand" type="MeshInstance3D" parent="Pivot/Arms/LeftArm" unique_id=1869755189]
+transform = Transform3D(0.90630776, -0.42261827, 0, 0.4082179, 0.87542605, 0.25881904, -0.10938165, -0.23456971, 0.9659258, -0.035, -0.08, 0.06)
 material_override = ExtResource("7_xmjww")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_6s7fb")
 
-[node name="RightWrist" type="Marker3D" parent="Pivot/Arms" unique_id=1672822531]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, -0.11, 0.11)
-metadata/forearm_length = 0.29
-metadata/upper_arm_length = 0.3
-
-[node name="LeftHand" type="MeshInstance3D" parent="Pivot/Arms" unique_id=2146652809]
-transform = Transform3D(0.90630776, -0.42261827, 0, 0.4082179, 0.87542605, 0.25881904, -0.10938165, -0.23456971, 0.9659258, -0.035, -0.08, 0.06)
-material_override = ExtResource("7_xmjww")
-cast_shadow = 0
-mesh = SubResource("BoxMesh_afxkh")
-
-[node name="LeftWrist" type="Marker3D" parent="Pivot/Arms" unique_id=351719885]
+[node name="LeftWrist" type="Marker3D" parent="Pivot/Arms/LeftArm" unique_id=1918134577]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05, -0.1, 0.09)
 metadata/forearm_length = 0.29
 metadata/upper_arm_length = 0.3
 
-[node name="RightForearm" type="MeshInstance3D" parent="." unique_id=50526397]
+[node name="RightArm" type="Node3D" parent="Pivot/Arms" unique_id=255950780]
+
+[node name="RightHand" type="MeshInstance3D" parent="Pivot/Arms/RightArm" unique_id=1313057035]
+transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0.005, -0.075, 0.075)
+material_override = ExtResource("7_xmjww")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_afxkh")
+
+[node name="RightWrist" type="Marker3D" parent="Pivot/Arms/RightArm" unique_id=835295996]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, -0.11, 0.11)
+metadata/forearm_length = 0.29
+metadata/upper_arm_length = 0.3
+
+[node name="RightForearm" type="MeshInstance3D" parent="." unique_id=489698600]
 transform = Transform3D(0.47689918, 0.41665262, -0.22443973, 0.8771979, -0.16991687, 0.13022651, 0.055596948, -0.8930448, -0.12949081, 0.13221987, -0.17511326, 0.17474541)
 material_override = ExtResource("8_1t6bf")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_0iog4")
 
-[node name="RightElbow" type="MeshInstance3D" parent="." unique_id=675817043]
+[node name="RightElbow" type="MeshInstance3D" parent="." unique_id=969840676]
 transform = Transform3D(0.47689918, 0.41665256, -0.77393013, 0.8771979, -0.16991685, 0.4490569, 0.055596948, -0.8930447, -0.44652, 0.24443972, -0.2402265, 0.2394908)
 material_override = ExtResource("8_1t6bf")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_sd5by")
 
-[node name="RightUpperArm" type="MeshInstance3D" parent="." unique_id=439951350]
+[node name="RightUpperArm" type="MeshInstance3D" parent="." unique_id=1500488566]
 transform = Transform3D(0.47689912, 0.65913945, 0.17443973, 0.8771979, -0.39875993, -0.080226496, 0.055597104, 0.6375937, -0.23050919, 0.15721986, -0.20011327, 0.3547454)
 material_override = ExtResource("8_1t6bf")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_nm56p")
 
-[node name="LeftForearm" type="MeshInstance3D" parent="." unique_id=1912775910]
+[node name="LeftForearm" type="MeshInstance3D" parent="." unique_id=1417336511]
 transform = Transform3D(0.48420015, -0.15850821, 0.24953912, -0.8300575, -0.3942119, 0.11439451, 0.2766856, -0.90524715, -0.09351002, -0.17476957, -0.15719725, 0.13675502)
 material_override = ExtResource("8_1t6bf")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_mjh3l")
 
-[node name="LeftElbow" type="MeshInstance3D" parent="." unique_id=257927139]
+[node name="LeftElbow" type="MeshInstance3D" parent="." unique_id=875366064]
 transform = Transform3D(0.4842001, -0.1585082, 0.8604798, -0.8300574, -0.39421183, 0.39446378, 0.27668557, -0.90524703, -0.3224483, -0.29953912, -0.21439451, 0.18351002)
 material_override = ExtResource("8_1t6bf")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_dmunr")
 
-[node name="LeftUpperArm" type="MeshInstance3D" parent="." unique_id=1238032271]
+[node name="LeftUpperArm" type="MeshInstance3D" parent="." unique_id=1551372245]
 transform = Transform3D(0.48420012, -0.84284437, 0.070460886, -0.8300573, -0.52738005, -0.0543945, 0.27668583, -0.10716251, -0.28648996, -0.33476955, -0.18719727, 0.32675502)
 material_override = ExtResource("8_1t6bf")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_ry243")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1970290307]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=211012517]
 libraries/ = SubResource("AnimationLibrary_n3qr6")

@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_i7fen")
-display_name = "Sniper"
+display_name = "Harrier"
 model_scene = ExtResource("1_fkq78")
 sound_prefix = "sniper"
 bolt_kick = 0.0
@@ -19,7 +19,7 @@ falloff_start = 300.0
 falloff_end = 400.0
 falloff_min = 1.0
 mag_size = 5
-reserve_ammo = 30
+ammo_type = "sniper"
 reload_time = 3.2
 reload_empty_time = 3.8
 draw_time = 0.85

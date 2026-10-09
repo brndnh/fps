@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_2mx3f")
-display_name = "DMR"
+display_name = "Heron"
 model_scene = ExtResource("1_o6bpq")
 sound_prefix = "dmr"
 bolt_kick = 0.025
@@ -17,7 +17,7 @@ falloff_start = 60.0
 falloff_end = 120.0
 falloff_min = 0.8
 mag_size = 10
-reserve_ammo = 60
+ammo_type = "sniper"
 reload_time = 2.5
 reload_empty_time = 3.2
 draw_time = 0.6

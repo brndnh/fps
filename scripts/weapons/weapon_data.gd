@@ -20,12 +20,15 @@ enum FireMode { AUTO, SEMI }
 
 @export_group("Fire")
 @export var fire_mode: FireMode = FireMode.AUTO
+@export var burst_count: int = 0 ## A burst fire mode as well (the fire mode key, X, switches): rounds per pull. 0 = none.
+@export var burst_rpm: float = 1000.0 ## Fire rate within a burst (rpm is the wait between bursts).
 @export var rpm: float = 600.0
 @export var damage: float = 14.0
 @export var head_multiplier: float = 1.75
 @export var pellets: int = 1 ## Shotguns: bullets per shot, each doing `damage`.
 @export var pellet_spread: float = 0.0 ## Degrees (cone radius) the pellets fan out around the aim point.
 @export var pellet_spread_ads: float = 0.0 ## The same, fully aimed.
+@export var pellet_line: bool = false ## The pellets fan out in a flat horizontal line (Apex Mastiff), pellet_spread either side, instead of a ring.
 @export var cycle_after_shot: bool = false ## Plays "cycle" (pump / bolt) after every shot that leaves a round in the mag.
 @export var prime_time: float = 0.0 ## Revolver (R8 style): hold fire this long to cock the hammer and it fires; keep holding to keep firing. Let go early and it eases back down.
 @export var unscope_on_shot: bool = false ## Drops out of ADS until the next shot is ready, then aims back in if you still are (AWP style).
@@ -35,7 +38,7 @@ enum FireMode { AUTO, SEMI }
 
 @export_group("Ammo")
 @export var mag_size: int = 28
-@export var reserve_ammo: int = 224 ## Ignored when the weapon manager has infinite reserve on.
+@export var ammo_type: String = "" ## Which ammo it takes: light, heavy, shells or sniper (WeaponManager.AMMO). Spare rounds are shared by every gun taking the same type.
 @export var reload_time: float = 2.4 ## Mag still has rounds.
 @export var reload_empty_time: float = 3.1 ## Mag was empty (also chambers a round).
 @export_range(0.0, 1.0) var reload_commit: float = 0.7 ## Ammo goes in at this fraction of the reload. Cancel before it and you get nothing.
@@ -47,6 +50,7 @@ enum FireMode { AUTO, SEMI }
 @export_group("Handling")
 @export var draw_time: float = 0.45 ## Flourish draws: the soonest you can shoot. You always wait for the whole draw animation.
 @export var quick_draw_time: float = 0.35 ## The same for the "draw_quick" animation.
+@export var alternate_draws: bool = false ## Knives: take turns through every draw* animation (flourish, quick, ...). Off = always the full "draw" flourish.
 @export var move_speed: float = 1.0 ## Movement speed multiplier while this is in your hands (sprint included).
 @export var holster_time: float = 0.25
 @export var ads_time: float = 0.22 ## Seconds to fully aim in.

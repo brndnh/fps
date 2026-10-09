@@ -2,7 +2,9 @@ class_name WeaponPickup
 extends RigidBody3D
 ## A gun lying in the world. Look at it and press Interact (E) to pick it up.
 ## Walking over it with a free gun slot picks it up too (not for guns on a rack).
-## Remembers its ammo. A thrown gun damages the first target it hits hard enough.
+## Remembers what's in its magazine (spare rounds stay with whoever carried it: they're
+## shared between guns, see WeaponManager.AMMO). A thrown gun damages the first target
+## it hits hard enough.
 
 const LAYER := 2 ## Physics layer for pickups: bullets and the player pass through them.
 const THROW_HIT_SPEED := 4.0
@@ -10,7 +12,6 @@ const AUTO_PICKUP_DELAY := 1.0 ## Seconds before a gun you dropped or threw can 
 
 @export var weapon: WeaponData
 @export var mag: int = -1 ## -1 = full.
-@export var reserve: int = -1
 
 var thrower: WeaponManager ## Set while the gun is in flight after a throw.
 var auto_pickup_delay := 0.0
@@ -22,12 +23,10 @@ static var _world_mats := {}
 func _ready() -> void:
 	add_to_group("weapon_pickups")
 	collision_layer = LAYER
-	collision_mask = 1
+	collision_mask = 1 | 8 | 16 | 32 # World, enemies, doors and props (a thrown gun can hit those).
 	mass = 3.0
 	if mag < 0:
 		mag = weapon.mag_size
-	if reserve < 0:
-		reserve = weapon.reserve_ammo
 	_build_visual()
 	contact_monitor = true
 	max_contacts_reported = 4
@@ -35,12 +34,11 @@ func _ready() -> void:
 
 
 ## Throws or drops a gun into the world.
-static func spawn(parent: Node, data: WeaponData, ammo: int, spare: int, at: Transform3D,
+static func spawn(parent: Node, data: WeaponData, ammo: int, at: Transform3D,
 		velocity: Vector3, spin: Vector3, by: WeaponManager = null) -> WeaponPickup:
 	var p := WeaponPickup.new()
 	p.weapon = data
 	p.mag = ammo
-	p.reserve = spare
 	p.thrower = by
 	p.auto_pickup_delay = AUTO_PICKUP_DELAY
 	parent.add_child(p)

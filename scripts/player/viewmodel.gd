@@ -29,7 +29,12 @@ extends Node3D
 @export var sprint_rotation_deg: Vector3 = Vector3(-12.0, 28.0, 8.0)
 @export var slide_position: Vector3 = Vector3(-0.02, -0.02, 0.02)
 @export var slide_rotation_deg: Vector3 = Vector3(0.0, 0.0, -14.0) ## The roll (z) is for sliding right; it mirrors sliding left and fades out sliding straight.
+@export var mantle_position: Vector3 = Vector3(0.04, -0.18, 0.08) ## Gun tucked down and away while you pull yourself up a ledge.
+@export var mantle_rotation_deg: Vector3 = Vector3(-35.0, -12.0, 22.0)
+@export var heal_position: Vector3 = Vector3(0.0, -0.7, 0.15) ## Gun dropped right out of view while your arms use a heal (HealInput).
+@export var heal_rotation_deg: Vector3 = Vector3(-40.0, 8.0, 0.0)
 @export var pose_speed: float = 9.0
+@export var mantle_pose_speed: float = 18.0 ## Mantles are quick: the tuck has to keep up.
 
 @export_group("Vertical")
 @export var air_offset_scale: float = 0.004
@@ -111,13 +116,21 @@ func _process(delta: float) -> void:
 	# Sprint / slide poses.
 	var target_pos := Vector3.ZERO
 	var target_rot := Vector3.ZERO
-	if st == Player.MoveState.SLIDE:
+	var speed_k := pose_speed
+	if st == Player.MoveState.MANTLE or player.is_wall_climbing():
+		target_pos = mantle_position
+		target_rot = mantle_rotation_deg
+		speed_k = mantle_pose_speed
+	elif player.health.healing:
+		target_pos = heal_position
+		target_rot = heal_rotation_deg
+	elif st == Player.MoveState.SLIDE:
 		target_pos = slide_position
 		target_rot = Vector3(slide_rotation_deg.x, slide_rotation_deg.y, slide_rotation_deg.z * player.slide_lean)
-	elif st == Player.MoveState.GROUND and player.is_sprinting and speed > player.run_speed * 0.9:
+	elif st == Player.MoveState.GROUND and player.is_sprinting and speed > player.run_speed * 0.9 and not _own_sprint_pose():
 		target_pos = sprint_position
 		target_rot = sprint_rotation_deg
-	var k := 1.0 - exp(-pose_speed * delta)
+	var k := 1.0 - exp(-speed_k * delta)
 	_pose_pos = _pose_pos.lerp(target_pos, k)
 	_pose_rot = _pose_rot.lerp(target_rot, k)
 
@@ -143,6 +156,20 @@ func _process(delta: float) -> void:
 			+ action_position + Vector3(0.0, 0.0, _kick_back)
 	rotation = _rest_rotation + (_sway + idle_rot * (PI / 180.0)) * motion + _pose_rot * (PI / 180.0) * hip \
 			+ action_rotation_deg * (PI / 180.0) + Vector3(deg_to_rad(_kick_rot), 0.0, 0.0)
+	# Left-handed (Settings.left_handed, H): everything mirrored across the middle of the screen.
+	if Settings.left_handed:
+		position.x = -position.x
+		rotation.y = -rotation.y
+		rotation.z = -rotation.z
+		scale = Vector3(-1, 1, 1)
+	else:
+		scale = Vector3.ONE
+
+
+## The weapon in hand has its own sprint animation (the kunai), so the general sprint pose stays off.
+func _own_sprint_pose() -> bool:
+	var weapons := player.get_node_or_null("Weapons") as WeaponManager
+	return weapons != null and weapons.has_own_sprint_pose()
 
 
 ## Hip and ADS rest positions for the weapon in hand.

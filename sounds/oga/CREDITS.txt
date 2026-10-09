@@ -1,0 +1,11 @@
+Recorded weapon handling sounds, all CC0 (public domain), from OpenGameArt.org.
+Cut into single hits and normalized for this project.
+
+pistol_mag_out/mag_in/slide   "Handgun Reload Sound Effect" by zer0_sol
+                              https://opengameart.org/content/handgun-reload-sound-effect
+rifle_a_*, rifle_b_*, pump_a  "Gun Reload Sounds" by SpringySpringo
+                              https://opengameart.org/content/gun-reload-sounds
+clip_a, clip_b, round_in      "Gun Reload Sound Effects" by BMacZero
+                              https://opengameart.org/content/gun-reload-sound-effects
+click_00..click_19            "Equipment Clicks III" by LFA (bolt action rifle, stapler, tape measure)
+                              https://opengameart.org/content/equipment-clicks-iii

@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/expedition/expedition.gd" id="1_exped"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_exped"]
+
+[sub_resource type="Sky" id="Sky_exped"]
+sky_material = SubResource("ProceduralSkyMaterial_exped")
+
+[sub_resource type="Environment" id="Environment_exped"]
+background_mode = 2
+sky = SubResource("Sky_exped")
+ambient_light_source = 3
+tonemap_mode = 2
+ssao_enabled = true
+
+[node name="Expedition" type="Node3D"]
+script = ExtResource("1_exped")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_exped")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
+shadow_enabled = true
+directional_shadow_max_distance = 120.0

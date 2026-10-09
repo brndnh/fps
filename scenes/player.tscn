@@ -11,12 +11,19 @@
 [ext_resource type="Script" path="res://scripts/ui/weapon_hud.gd" id="14_wphud"]
 [ext_resource type="Resource" path="res://weapons/knife.tres" id="15_knife"]
 [ext_resource type="Script" path="res://scripts/ui/buy_menu.gd" id="16_buymn"]
+[ext_resource type="Script" path="res://scripts/player/player_health.gd" id="17_phlth"]
+[ext_resource type="Script" path="res://scripts/ui/status_hud.gd" id="18_sthud"]
+[ext_resource type="Script" path="res://scripts/player/interact_input.gd" id="19_revin"]
+[ext_resource type="Script" path="res://scripts/player/heal_input.gd" id="20_heal"]
+[ext_resource type="Script" path="res://scripts/ui/inventory.gd" id="21_invnt"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_a8ls1"]
 radius = 0.4
 height = 1.8
 
 [node name="Player" type="CharacterBody3D" unique_id=72762536]
+collision_layer = 4
+collision_mask = 61
 floor_max_angle = 0.907571
 floor_snap_length = 0.35
 script = ExtResource("1_smehm")
@@ -68,3 +75,18 @@ script = ExtResource("14_wphud")
 
 [node name="BuyMenu" type="CanvasLayer" parent="."]
 script = ExtResource("16_buymn")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("17_phlth")
+
+[node name="StatusHUD" type="CanvasLayer" parent="."]
+script = ExtResource("18_sthud")
+
+[node name="Interact" type="Node" parent="."]
+script = ExtResource("19_revin")
+
+[node name="Heal" type="Node" parent="."]
+script = ExtResource("20_heal")
+
+[node name="Inventory" type="CanvasLayer" parent="."]
+script = ExtResource("21_invnt")

@@ -1,15 +1,34 @@
 extends CanvasLayer
 ## Pause menu + Settings screen (autoload "PauseMenu"). Esc opens/closes it.
 ## Built in code so it works in every level without being added to scenes.
+## Online the game keeps running behind it (you just stand still), and only the host
+## can change map. Esc → Lobby hosts and joins games and shows the 10 player slots (in
+## game, the inventory (Tab) shows your squad).
 
 const ACCENT := Color(0.35, 1.0, 0.45)
 
-const MAPS := [["Dust II", "res://scenes/dust2.tscn"], ["Firing Range", "res://scenes/firing_range.tscn"]]
+const MAPS := [
+	["Firing Range (hub)", "res://scenes/firing_range.tscn"],
+	["Research Complex (new layout)", "res://scenes/expedition.tscn"],
+	["Dust II", "res://scenes/dust2.tscn"],
+]
 
 var _root: Control
 var _main_panel: Control
 var _settings_panel: Control
 var _maps_panel: Control
+var _mp_panel: Control
+var _panels: Array[Control] = []
+var _title_label: Label
+var _map_buttons: Array[Button] = []
+var _maps_hint: Label
+var _mp_status: Label
+var _name_edit: LineEdit
+var _port_spin: SpinBox
+var _address_edit: LineEdit
+var _host_button: Button
+var _join_button: Button
+var _leave_button: Button
 var _sens_slider: HSlider
 var _sens_spin: SpinBox
 var _invert_check: CheckButton
@@ -32,7 +51,10 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build_ui()
 	Settings.changed.connect(_refresh)
+	Net.status_changed.connect(_refresh_net)
+	Net.status_changed.connect(_on_net_status)
 	_refresh()
+	_refresh_net()
 	visible = false
 
 
@@ -40,7 +62,7 @@ func _ready() -> void:
 
 func open() -> void:
 	visible = true
-	get_tree().paused = true
+	get_tree().paused = not Net.is_online()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_show_main()
 
@@ -52,45 +74,65 @@ func resume() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
-## Switches map (the run starts on Dust II; see run/main_scene in project.godot).
+## Switches map, for everyone when you're hosting (the run starts on the Firing Range;
+## see run/main_scene in project.godot).
 func _load_map(path: String) -> void:
 	resume()
-	get_tree().change_scene_to_file(path)
+	if path == Game.EXPEDITION:
+		Game.start_expedition() # A new seed every time.
+	else:
+		Game.change_map(path)
+
+
+func _show(panel: Control) -> void:
+	_cancel_listen()
+	for p in _panels:
+		p.visible = p == panel
 
 
 func _show_main() -> void:
-	_cancel_listen()
-	_main_panel.visible = true
-	_settings_panel.visible = false
-	_maps_panel.visible = false
+	_show(_main_panel)
 
 
 func _show_maps() -> void:
-	_main_panel.visible = false
-	_settings_panel.visible = false
-	_maps_panel.visible = true
+	_show(_maps_panel)
 
 
 func _show_settings() -> void:
-	_main_panel.visible = false
-	_maps_panel.visible = false
-	_settings_panel.visible = true
+	_show(_settings_panel)
+
+
+func _show_multiplayer() -> void:
+	_show(_mp_panel)
+
+
+func _on_net_status() -> void:
+	if visible:
+		get_tree().paused = not Net.is_online()
+
+
+func _refresh_net() -> void:
+	var online := Net.is_online()
+	var client := online and Net.state != Net.State.HOSTING
+	_title_label.text = "MENU" if online else "PAUSED"
+	_mp_status.text = Net.status
+	_host_button.disabled = online
+	_join_button.disabled = online
+	_port_spin.editable = not online
+	_address_edit.editable = not online
+	_leave_button.visible = online
+	for b in _map_buttons:
+		b.disabled = client
+	_maps_hint.visible = client
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		if not visible:
 			open()
-		elif _settings_panel.visible:
+		elif _settings_panel.visible or _mp_panel.visible:
 			_show_main()
 		else:
-			resume()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("map_menu") and not _listening:
-		if not visible:
-			open()
-			_show_maps()
-		elif _maps_panel.visible:
 			resume()
 		get_viewport().set_input_as_handled()
 	elif not visible and event is InputEventMouseButton and event.pressed \
@@ -191,20 +233,24 @@ func _build_ui() -> void:
 	_main_panel = _panel(Vector2(360, 0))
 	center.add_child(_main_panel)
 	var mv := _vbox(_main_panel, 12)
-	_title(mv, "PAUSED")
+	_title_label = _title(mv, "PAUSED")
 	_button(mv, "Resume", resume)
+	_button(mv, "Lobby", _show_multiplayer)
 	_button(mv, "Settings", _show_settings)
 	_button(mv, "Maps", _show_maps)
 	_button(mv, "Quit", func() -> void: get_tree().quit())
 
-	# Maps panel (also straight from the Maps key, M)
+	# Maps panel
 	_maps_panel = _panel(Vector2(360, 0))
 	center.add_child(_maps_panel)
 	var mp := _vbox(_maps_panel, 12)
 	_title(mp, "MAPS")
 	for m: Array in MAPS:
-		_button(mp, m[0], _load_map.bind(m[1]))
+		_map_buttons.append(_button(mp, m[0], _load_map.bind(m[1])))
+	_maps_hint = _hint(mp, "Only the host can change map.")
 	_button(mp, "Back", _show_main)
+
+	_build_multiplayer_panel(center)
 
 	# Settings panel
 	_settings_panel = _panel(Vector2(780, 660))
@@ -224,6 +270,60 @@ func _build_ui() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(spacer)
 	_button(bottom, "Back", _show_main)
+
+	_panels = [_main_panel, _maps_panel, _settings_panel, _mp_panel]
+
+
+## Esc → Lobby: your name, host / join / leave, and the 10 player slots.
+func _build_multiplayer_panel(center: Control) -> void:
+	_mp_panel = _panel(Vector2(720, 0))
+	center.add_child(_mp_panel)
+	var v := _vbox(_mp_panel, 12)
+	_title(v, "LOBBY")
+	_mp_status = Label.new()
+	_mp_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_mp_status.add_theme_color_override("font_color", ACCENT)
+	v.add_child(_mp_status)
+
+	var row := _row(v, "Your name")
+	_name_edit = LineEdit.new()
+	_name_edit.text = Settings.get_player_name()
+	_name_edit.max_length = Game.MAX_NAME_LENGTH
+	_name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_name_edit.text_submitted.connect(func(t: String) -> void: Game.rename_me(t))
+	_name_edit.focus_exited.connect(func() -> void:
+		if _name_edit.text != Settings.get_player_name():
+			Game.rename_me(_name_edit.text))
+	row.add_child(_name_edit)
+
+	row = _row(v, "Port")
+	_port_spin = SpinBox.new()
+	_port_spin.min_value = 1024
+	_port_spin.max_value = 65535
+	_port_spin.value = Net.DEFAULT_PORT
+	_port_spin.custom_minimum_size.x = 130
+	row.add_child(_port_spin)
+	_host_button = _button(row, "Host", func() -> void: Net.host(int(_port_spin.value)))
+
+	row = _row(v, "Host address")
+	_address_edit = LineEdit.new()
+	_address_edit.text = "127.0.0.1"
+	_address_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_address_edit.text_submitted.connect(func(_t: String) -> void: _join())
+	row.add_child(_address_edit)
+	_join_button = _button(row, "Join", _join)
+
+	_leave_button = _button(v, "Leave", func() -> void: Net.leave())
+	v.add_child(LobbyBoard.new())
+	_hint(v, "To test on one PC, host in one window and join 127.0.0.1 from another. "
+			+ "Over the internet the host has to forward UDP port %d (Steam invites will replace this). " % Net.DEFAULT_PORT
+			+ "In game, the inventory ([%s]) shows your squad." % Settings.event_label(Settings.get_binding("inventory", 0)))
+	_button(v, "Back", _show_main)
+
+
+func _join() -> void:
+	if not Net.is_online():
+		Net.join(_address_edit.text, int(_port_spin.value))
 
 
 func _build_mouse_tab(tabs: TabContainer) -> void:
@@ -375,12 +475,13 @@ func _vbox(parent: Control, sep: int) -> VBoxContainer:
 	return v
 
 
-func _title(parent: Control, text: String) -> void:
+func _title(parent: Control, text: String) -> Label:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_font_size_override("font_size", 30)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	parent.add_child(l)
+	return l
 
 
 func _button(parent: Control, text: String, cb: Callable) -> Button:
@@ -419,13 +520,14 @@ func _row(parent: Control, label: String) -> HBoxContainer:
 	return h
 
 
-func _hint(parent: Control, text: String) -> void:
+func _hint(parent: Control, text: String) -> Label:
 	var l := Label.new()
 	l.text = text
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.add_theme_font_size_override("font_size", 14)
 	l.add_theme_color_override("font_color", Color(1, 1, 1, 0.55))
 	parent.add_child(l)
+	return l
 
 
 func _mode_picker(row: HBoxContainer) -> OptionButton:

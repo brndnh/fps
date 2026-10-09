@@ -5,8 +5,6 @@
 [ext_resource type="PackedScene" path="res://scenes/target.tscn" id="3_twgk3"]
 [ext_resource type="Script" path="res://scripts/target.gd" id="4_pp7ag"]
 [ext_resource type="Script" path="res://scripts/buy_zone.gd" id="5_ohr5t"]
-[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="6_iy8r6"]
-[ext_resource type="Script" path="res://scripts/player/player.gd" id="7_jf8wx"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_cnns7"]
 sky_top_color = Color(0.36, 0.55, 0.82, 1)
@@ -142,8 +140,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.823, 2.515, -32.606)
 script = ExtResource("5_ohr5t")
 size = Vector3(10, 6, 10)
 
-[node name="Player" type="CharacterBody3D" parent="." unique_id=72762536 instance=ExtResource("6_iy8r6")]
+[node name="PlayerSpawn" type="Marker3D" parent="." groups=["player_spawns"]]
 transform = Transform3D(0.44150364, 0, -0.8972595, 0, 1, 0, 0.8972595, 0, 0.44150364, -14.177, 3.3309999, 44.394)
-floor_max_angle = 0.907571
-floor_snap_length = 0.35
-script = ExtResource("7_jf8wx")

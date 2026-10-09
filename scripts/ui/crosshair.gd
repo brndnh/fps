@@ -42,18 +42,25 @@ func _draw() -> void:
 	var c := size * 0.5
 	var alpha := 1.0
 	var g := gap
+	var gv := gap # Vertical gap: the same, except a line-spread shotgun's pellets only spread sideways.
 	var cam := get_viewport().get_camera_3d()
-	if _weapons != null and _weapons.is_physics_processing() and cam != null:
+	if _weapons != null and not _weapons.is_physics_processing():
+		alpha = 0.0 # Downed or out: nothing in your hands.
+	elif owner is Player and (owner as Player).superglide_wait() >= 0.0:
+		alpha = 0.0 # The superglide cue (StatusHUD) is in its place.
+	elif _weapons != null and cam != null:
 		alpha = 1.0 - clampf(_weapons.ads * 2.0, 0.0, 1.0)
 		# Spread cone (degrees) -> pixels. Camera FOV is vertical.
 		var spread := deg_to_rad(_weapons.get_spread_deg())
 		g += tan(spread) / tan(deg_to_rad(cam.fov) * 0.5) * size.y * 0.5
+		gv += tan(deg_to_rad(_weapons.get_vertical_spread_deg())) / tan(deg_to_rad(cam.fov) * 0.5) * size.y * 0.5
 	if alpha > 0.01:
 		var col := Color(color, alpha)
 		var out := Color(0, 0, 0, alpha)
 		for dir: Vector2 in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
-			var a: Vector2 = c + dir * g
-			var b: Vector2 = c + dir * (g + length)
+			var dg := g if dir.y == 0.0 else gv
+			var a: Vector2 = c + dir * dg
+			var b: Vector2 = c + dir * (dg + length)
 			if outline:
 				draw_line(a - dir, b + dir, out, thickness + 2.0)
 			draw_line(a, b, col, thickness)

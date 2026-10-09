@@ -26,7 +26,7 @@ var _mat := {}
 
 
 # Built on the first frame rather than in _init: by then the autoloads (Settings, Sfx) exist,
-# so the player, buy zone and spawner scripts compile when they're attached.
+# so the buy zone and spawner scripts compile when they're attached.
 func _process(_delta: float) -> bool:
 	_build()
 	return true
@@ -214,12 +214,14 @@ func _props(places: Array) -> void:
 				a.position = p
 				_add(buy, a)
 	_root.set_meta("radar_labels", labels)
-	var player := (load("res://scenes/player.tscn") as PackedScene).instantiate() as Node3D
-	player.name = "Player"
-	player.position = spawn + Vector3(0, 0.1, 0)
+	# Players are spawned by Game, lined up around this marker.
+	var player_spawn := Marker3D.new()
+	player_spawn.name = "PlayerSpawn"
+	player_spawn.add_to_group("player_spawns", true)
+	player_spawn.position = spawn + Vector3(0, 0.1, 0)
 	var to := look - spawn
-	player.rotation.y = atan2(-to.x, -to.z) # Out of T spawn, towards mid and long.
-	_add(_root, player)
+	player_spawn.rotation.y = atan2(-to.x, -to.z) # Out of T spawn, towards mid and long.
+	_add(_root, player_spawn)
 
 
 # --- Materials, light, helpers ----------------------------------------------------------

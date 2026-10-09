@@ -1,17 +1,16 @@
 [gd_resource type="Resource" script_class="WeaponData" format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/weapons/knife_flip.tscn" id="1_ld5sn"]
-[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_60wjv"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/knife_kunai.tscn" id="1_apb0k"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_dt83x"]
 
 [resource]
-script = ExtResource("2_60wjv")
-display_name = "Flip Knife"
-model_scene = ExtResource("1_ld5sn")
+script = ExtResource("2_dt83x")
+display_name = "Kunai"
+model_scene = ExtResource("1_apb0k")
 sound_prefix = ""
 is_melee = true
 bolt_node = NodePath("")
 mag_size = 0
-reserve_ammo = 0
 draw_time = 0.4
 quick_draw_time = 0.25
 move_speed = 1.12

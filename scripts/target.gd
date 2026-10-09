@@ -2,6 +2,10 @@ extends Node3D
 ## Firing range dummy. Shield then health like Apex (100 + 100 = purple armour).
 ## Shows floating damage numbers and bars, falls over when killed, and resets
 ## after a few seconds without taking damage.
+##
+## Online, the host owns its shield and health so everyone sees the same bars. Whoever
+## shoots it sees their damage number and the flash straight away (only they see the
+## number) and reports the hit; the host applies it and sends everyone the result.
 
 const SHIELD_COLOR := Color(0.72, 0.35, 1.0)
 const HEALTH_COLOR := Color(0.95, 0.95, 0.95)
@@ -26,6 +30,7 @@ var _flash := 0.0
 var _bars: Node3D
 var _shield_fill: MeshInstance3D
 var _health_fill: MeshInstance3D
+var _fall: Tween
 
 static var _flash_mat: StandardMaterial3D
 
@@ -61,8 +66,8 @@ func _process(delta: float) -> void:
 	if dead:
 		return
 	_since_hit += delta
-	if _since_hit >= reset_delay and _bars.visible:
-		_refill()
+	if multiplayer.is_server() and _since_hit >= reset_delay and _bars.visible:
+		_set_state.rpc(max_shield, max_health, false) # Refill.
 	var cam := get_viewport().get_camera_3d()
 	if _bars.visible and cam != null:
 		var p := cam.global_position
@@ -71,24 +76,61 @@ func _process(delta: float) -> void:
 			_bars.look_at(p, Vector3.UP, true)
 
 
-## Called by the WeaponManager. Returns true if this hit killed it.
+## Called by the WeaponManager of whoever hit it. Returns true if this hit kills it
+## (as far as the shooter can tell; the host has the final say).
+## Which way its front faces (for backstabs): +Z, towards the firing line.
+func get_facing() -> Vector3:
+	return global_basis.z
+
+
 func take_damage(amount: float, headshot: bool, at: Vector3) -> bool:
 	if dead:
 		return false
-	_since_hit = 0.0
 	var to_shield := minf(amount, shield)
-	shield -= to_shield
-	health = maxf(health - (amount - to_shield), 0.0)
-	_spawn_number(amount, headshot, to_shield > 0.0, at)
-	for m in _meshes:
-		m.material_override = _flash_mat
-	_flash = 0.05
-	_bars.visible = true
+	var color := HEAD_COLOR if headshot else (SHIELD_COLOR if to_shield > 0.0 else HEALTH_COLOR)
+	WeaponFx.damage_number(get_tree().current_scene, at, amount, color, headshot)
+	var new_health := maxf(health - (amount - to_shield), 0.0)
+	if multiplayer.is_server():
+		_apply_damage(amount)
+	else:
+		_apply_damage.rpc_id(1, amount)
+		_show_state(shield - to_shield, new_health, new_health <= 0.0) # Predicted; the host's answer replaces it.
+	return new_health <= 0.0
+
+
+## Host: the authoritative hit.
+@rpc("any_peer", "call_remote", "reliable")
+func _apply_damage(amount: float) -> void:
+	if not multiplayer.is_server() or dead:
+		return
+	var to_shield := minf(amount, shield)
+	var new_health := maxf(health - (amount - to_shield), 0.0)
+	_set_state.rpc(shield - to_shield, new_health, new_health <= 0.0)
+	if new_health <= 0.0:
+		await get_tree().create_timer(0.3 + respawn_delay).timeout
+		_set_state.rpc(max_shield, max_health, false) # Stand back up.
+
+
+@rpc("authority", "call_local", "reliable")
+func _set_state(new_shield: float, new_health: float, is_dead: bool) -> void:
+	_show_state(new_shield, new_health, is_dead)
+
+
+func _show_state(new_shield: float, new_health: float, is_dead: bool) -> void:
+	var hurt := new_shield + new_health < shield + health
+	shield = new_shield
+	health = new_health
+	if hurt:
+		_since_hit = 0.0
+		for m in _meshes:
+			m.material_override = _flash_mat
+		_flash = 0.05
 	_update_bars()
-	if health <= 0.0:
+	if is_dead and not dead:
 		_die()
-		return true
-	return false
+	elif not is_dead and dead:
+		_respawn()
+	_bars.visible = not dead and (shield < max_shield or health < max_health)
 
 
 func _die() -> void:
@@ -96,52 +138,20 @@ func _die() -> void:
 	_bars.visible = false
 	for b in _bodies:
 		b.collision_layer = 0
-	var tw := create_tween()
-	tw.tween_property(_pivot, "rotation:x", -1.45, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tw.tween_interval(respawn_delay)
-	tw.tween_property(_pivot, "rotation:x", 0.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.tween_callback(_respawn)
+	if _fall != null:
+		_fall.kill()
+	_fall = create_tween()
+	_fall.tween_property(_pivot, "rotation:x", -1.45, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 
 func _respawn() -> void:
 	dead = false
 	for b in _bodies:
 		b.collision_layer = 1
-	_refill()
-
-
-func _refill() -> void:
-	shield = max_shield
-	health = max_health
-	_bars.visible = false
-	_update_bars()
-
-
-# --- Damage numbers -------------------------------------------------------------
-
-func _spawn_number(amount: float, headshot: bool, hit_shield: bool, at: Vector3) -> void:
-	var l := Label3D.new()
-	l.text = str(roundi(amount))
-	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	l.no_depth_test = true
-	l.fixed_size = true
-	l.pixel_size = 0.0009
-	l.font_size = 52 if headshot else 40
-	l.outline_size = 12
-	l.outline_modulate = Color(0, 0, 0, 0.85)
-	l.modulate = HEAD_COLOR if headshot else (SHIELD_COLOR if hit_shield else HEALTH_COLOR)
-	l.render_priority = 20
-	l.outline_render_priority = 19
-	get_tree().current_scene.add_child(l)
-	var side := Vector3(randf_range(-0.25, 0.25), 0.0, 0.0)
-	l.global_position = at + Vector3(0.0, 0.15, 0.0) + side
-	var tw := l.create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(l, "global_position", l.global_position + Vector3(0.0, 0.5, 0.0) + side, 0.7) \
-			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.tween_property(l, "modulate:a", 0.0, 0.3).set_delay(0.45)
-	tw.tween_property(l, "outline_modulate:a", 0.0, 0.3).set_delay(0.45)
-	tw.chain().tween_callback(l.queue_free)
+	if _fall != null:
+		_fall.kill()
+	_fall = create_tween()
+	_fall.tween_property(_pivot, "rotation:x", 0.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 # --- Bars ------------------------------------------------------------------------

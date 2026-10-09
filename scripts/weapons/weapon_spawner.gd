@@ -1,10 +1,12 @@
 extends Node3D
-## Weapon rack slot: a gun floats here, slowly turning. Take it and another
+## Weapon rack slot: a gun floats here, slowly turning (or, `resting`, sits still where it's
+## placed: on a rack's pegs or lying on a table). Take it and another
 ## one appears after respawn_delay.
 
 @export var weapon: WeaponData
 @export var respawn_delay: float = 3.0
 @export var spin_speed: float = 0.8 ## Radians per second.
+@export var resting: bool = false ## Sits still as placed instead of floating and turning.
 
 var _pickup: WeaponPickup
 var _timer := 0.0
@@ -18,6 +20,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_t += delta
 	if is_instance_valid(_pickup) and _pickup.freeze:
+		if resting:
+			return
 		_pickup.rotation.y += spin_speed * delta
 		_pickup.position.y = sin(_t * 2.0) * 0.04
 		return

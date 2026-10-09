@@ -4,6 +4,9 @@ extends Node
 ## ADS, reload, switching (Q = last weapon), inspect, melee, throwing (G), picking
 ## up (E, or walk over a dropped gun with a free slot) and buying (the buy menu
 ## calls buy() while you're in a buy zone).
+## Ammo (Apex style): spare rounds are carried by type (AMMO: light, heavy, shells,
+## sniper), shared by every gun that takes that type, up to a carry limit. Unlimited in
+## the hub; on expeditions you start each run with a little and find more.
 ## Lives under the Player.
 ## Shots are hitscan from the eye. Recoil kicks the real view (Apex style): ADS
 ## shots land exactly on the crosshair, and you pull down against a fixed pattern.
@@ -21,13 +24,29 @@ enum Shells { START, LOAD, END } ## Phases of a shell-by-shell reload.
 const GUN_SLOTS := 2
 const MELEE_SLOT := 2
 const BLEND := 0.12 ## Seconds to blend between animations.
+const INSPECT_CANCEL_BLEND := 0.35 ## R mid-inspect: how long the weapon takes to settle back (or blend into the reload).
+const SPRINT_POSE_BLEND := 0.08 ## Blend into a weapon's own sprint animations (they carry the move themselves, like the kunai's twirl).
+const SHOT_MASK := 1 | 8 | 16 | 32 ## World and targets (layer 1), enemies (4), breach doors (5) and props (6). Not pickups or teammates.
+const PROP_SHOT_PUSH := 0.3 ## Impulse (N s) per point of damage a hit gives a physics prop.
+const BACKSTAB_MULTIPLIER := 2.0 ## Melee from behind an enemy or a range dummy.
+const BACKSTAB_DOT := 0.35 ## How squarely behind counts (dot product of its facing with the way you're hitting it).
+const STILL_SPEED := 1.5 ## m/s: moving slower than this counts as (partly) standing still for accuracy.
+const MIN_STEADY := 0.1 ## Crouching and standing still can't shrink the spread below this share.
+## Spare ammo by type. carry: most you can hold; start: what you set out with on an
+## expedition; box: what an ammo box holds.
+const AMMO := {
+	light = {name = "LIGHT", carry = 240, start = 120, box = 60, color = Color(0.95, 0.72, 0.3)},
+	heavy = {name = "HEAVY", carry = 180, start = 90, box = 45, color = Color(0.3, 0.85, 0.7)},
+	shells = {name = "SHOTGUN", carry = 40, start = 16, box = 10, color = Color(0.95, 0.35, 0.3)},
+	sniper = {name = "SNIPER", carry = 40, start = 20, box = 10, color = Color(0.55, 0.55, 1.0)},
+}
+const AMMO_ORDER := ["light", "heavy", "shells", "sniper"]
 
 
 ## One carried weapon and its viewmodel.
 class Slot:
 	var data: WeaponData
 	var mag: int
-	var reserve: int
 	var model: Node3D
 	var anim: AnimationPlayer
 	var muzzle: Node3D
@@ -35,14 +54,18 @@ class Slot:
 	var bolt: Node3D
 	var bolt_rest: Vector3
 	var draw_index: int = 0 ## Which draw animation comes next (they take turns).
+	var burst: bool = false ## In its burst fire mode (WeaponData.burst_count; X switches).
 
 
 @export var starting_weapons: Array[WeaponData] = [] ## Up to two guns.
 @export var melee_weapon: WeaponData ## Fallback; the knife last bought in the buy menu (saved in Settings) wins.
-@export var infinite_reserve: bool = true
-@export var always_flourish_guns: bool = true ## Guns always play their full "draw" flourish. Off = they take turns with their other draw* animations (knives always do).
+@export var infinite_reserve: bool = true ## Unlimited spare ammo. Set per map: on in the hub, off on expeditions.
+@export var always_flourish_guns: bool = true ## Guns always play their full "draw" flourish. Off = they take turns with their other draw* animations (knives do if their alternate_draws is on).
 @export var stow_on_switch: bool = false ## Lower the old weapon before drawing the new one. Off = CS style: the new weapon's draw starts straight away.
 @export var max_range: float = 300.0
+@export var crouch_accuracy: float = 0.3 ## Crouched: spread and bloom shrink by this share...
+@export var still_accuracy: float = 0.9 ## ...and standing still, by this much more (fading out by STILL_SPEED): 90% tighter...
+@export var still_accuracy_scoped: float = 0.2 ## ...except scoped rifles (the sniper), which stay wild from the hip.
 
 @export_group("Throw / Pickup")
 @export var pickup_range: float = 2.5
@@ -55,6 +78,7 @@ class Slot:
 @onready var viewmodel: Viewmodel = player.get_node("Head/Camera3D/Viewmodel")
 
 var buy_zones: int = 0 ## How many buy zones you're standing in (BuyZone updates it).
+var ammo := {} ## Spare rounds carried, by AMMO type.
 var current: int = MELEE_SLOT
 var ads: float = 0.0 ## 0 = hip, 1 = fully aimed.
 var action: Action = Action.NONE
@@ -92,22 +116,62 @@ var _want_melee: bool = false
 var _want_heavy: bool = false
 var _want_throw: bool = false
 var _want_pickup: bool = false
+var _sprint_pose := false ## Showing the weapon's own "sprint" animation (the kunai's reverse grip).
+var _left_handed := Settings.left_handed ## The hand the viewmodel was last drawn in.
+var _burst_left := 0 ## Rounds still to come in the burst being fired.
+var _health: PlayerHealth
 
 
 func _ready() -> void:
 	for i in mini(starting_weapons.size(), GUN_SLOTS):
 		if starting_weapons[i] != null:
-			_slots[i] = _make_slot(starting_weapons[i], -1, -1)
+			_slots[i] = _make_slot(starting_weapons[i], -1)
 	var knife := _chosen_knife()
 	if knife != null:
-		_slots[MELEE_SLOT] = _make_slot(knife, 0, 0)
+		_slots[MELEE_SLOT] = _make_slot(knife, 0)
 	Settings.changed.connect(_on_settings_changed)
+	_restock()
+	Game.level_started.connect(_restock)
 	var first := _cycle_from(-1, 1)
 	if first < 0:
 		set_process(false)
 		set_physics_process(false)
 		return
 	_equip(first)
+	_health = player.get_node("Health") as PlayerHealth
+	_health.life_changed.connect(_on_life_changed)
+
+
+## Downed or out: weapons go away (nothing in your hands, no firing, aiming or
+## switching). Back up: the weapon you had comes back out with its draw.
+func _on_life_changed() -> void:
+	var up := _health.is_up()
+	if up == is_physics_processing():
+		return
+	set_process(up)
+	set_physics_process(up)
+	set_process_unhandled_input(up)
+	viewmodel.visible = up
+	if up:
+		_equip(current)
+		return
+	for s: Slot in _slots:
+		if s != null:
+			if s.model.has_method("stop_sounds"):
+				s.model.stop_sounds()
+			s.model.visible = false
+			if s.flash != null:
+				s.flash.visible = false
+	action = Action.NONE
+	ads = 0.0
+	_aim_toggled = false
+	_prime = 0.0
+	player.sprint_blocked = false
+	player.ads_amount = 0.0
+	player.zoom = 1.0
+	player.move_speed_multiplier = 1.0
+	player.weapon_speed_multiplier = 1.0
+	viewmodel.ads_blend = 0.0
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -124,6 +188,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		_request_switch(_cycle_from(get_selected_slot(), -1))
 	if event.is_action_pressed("reload"):
 		_want_reload = true
+	if event.is_action_pressed("fire_mode"):
+		_toggle_fire_mode()
+	if event.is_action_pressed("flip_hand"):
+		Settings.set_value("left_handed", not Settings.left_handed) # _on_settings_changed redraws.
 	if event.is_action_pressed("inspect"):
 		_want_inspect = true
 	if event.is_action_pressed("melee"):
@@ -155,13 +223,16 @@ func _physics_process(delta: float) -> void:
 		_sprint_out = d.sprint_to_fire_time
 	else:
 		_sprint_out = maxf(_sprint_out - delta, 0.0)
+	_update_sprint_pose(s)
 
 	# Aim
 	var aim_input := _aim_toggled if Settings.toggle_aim else (captured and Input.is_action_pressed("aim"))
 	var fire_held := captured and Input.is_action_pressed("fire")
 	var can_aim := not d.is_melee and (action == Action.NONE or action == Action.RELOAD or action == Action.INSPECT)
 	var cycling := d.unscope_on_shot and _shot_timer > 0.0 # Working the bolt: scope comes back after.
-	var want_ads := aim_input and can_aim and not player.is_sprinting and not cycling
+	# Both hands busy: pulling yourself up a ledge, or using a heal.
+	var hands_busy := player.state == Player.MoveState.MANTLE or player.is_wall_climbing() or player.health.healing
+	var want_ads := aim_input and can_aim and not player.is_sprinting and not cycling and not hands_busy
 	ads = move_toward(ads, 1.0 if want_ads else 0.0, delta / maxf(d.ads_time, 0.01))
 	if want_ads:
 		_settle_flourish(s)
@@ -190,13 +261,20 @@ func _physics_process(delta: float) -> void:
 	elif _want_reload and action == Action.INSPECT:
 		_cancel_inspect() # R stops an inspect (and reloads, if there's anything to reload).
 		if not d.is_melee:
-			_try_reload()
+			_try_reload(INSPECT_CANCEL_BLEND)
 	elif _want_reload and not d.is_melee and action == Action.NONE:
 		_try_reload()
-	elif _want_inspect and ads < 0.05 and (action == Action.NONE or (d.is_melee and action == Action.DRAW)):
+	elif ads < 0.05 and (_want_inspect and (action == Action.NONE or (d.is_melee and action == Action.DRAW))
+			or (d.is_melee and action == Action.DRAW and Input.is_action_pressed("inspect"))):
 		# Knives can inspect mid-draw: the draw blends into the inspect, which makes for some
 		# new flourishes. The draw time still counts. An inspect already playing carries on.
+		# Holding inspect as you switch to the knife goes straight into it, too.
 		var blend := 0.2 if action == Action.DRAW else BLEND
+		# Straight from the draw (inspect held as you switched): the draw's ring of steel still
+		# plays, right away, even if the inspect took over before its cue came round.
+		var rig := slot().model
+		if d.is_melee and action == Action.DRAW and rig.has_method("played_recently") and not rig.played_recently("knife_draw", 400):
+			rig.play_sfx("knife_draw", -6.0)
 		_start(Action.INSPECT, _play(slot(), "inspect", -1.0, blend))
 	_want_melee = false
 	_want_heavy = false
@@ -265,6 +343,11 @@ func _chosen_knife() -> WeaponData:
 
 ## Swaps in a newly picked knife. If it's in your hands, it comes out with its first draw.
 func _on_settings_changed() -> void:
+	# Switched hands (H): the weapon comes out again in the other hand, draw and all.
+	if Settings.left_handed != _left_handed:
+		_left_handed = Settings.left_handed
+		if is_physics_processing() and action != Action.THROW and action != Action.MELEE:
+			_equip(current)
 	var knife := _chosen_knife()
 	var old: Slot = _slots[MELEE_SLOT]
 	if knife == null or (old != null and old.data == knife):
@@ -274,18 +357,19 @@ func _on_settings_changed() -> void:
 		if current != MELEE_SLOT:
 			_play(slot(), "idle")
 	_free_slot(MELEE_SLOT)
-	_slots[MELEE_SLOT] = _make_slot(knife, 0, 0)
+	_slots[MELEE_SLOT] = _make_slot(knife, 0)
 	if current == MELEE_SLOT:
 		_equip(MELEE_SLOT)
 
 
-func _make_slot(d: WeaponData, mag: int, reserve: int) -> Slot:
+func _make_slot(d: WeaponData, mag: int) -> Slot:
 	var s := Slot.new()
 	s.data = d
 	s.mag = d.mag_size if mag < 0 else mag
-	s.reserve = d.reserve_ammo if reserve < 0 else reserve
 	s.model = d.model_scene.instantiate()
 	s.model.visible = false
+	if "sound_voice" in s.model:
+		s.model.set("sound_voice", voice_of(d))
 	viewmodel.add_child(s.model)
 	s.anim = s.model.get_node_or_null("AnimationPlayer")
 	s.muzzle = s.model.get_node_or_null("Pivot/Gun/Muzzle")
@@ -337,7 +421,27 @@ func _settle_flourish(s: Slot) -> void:
 
 # --- Actions -------------------------------------------------------------------
 
+## Weapons with their own "sprint" animation (the kunai) switch to it while you sprint with
+## nothing else going on, and ease back to "idle" when you stop. (The Viewmodel's general
+## sprint pose stays out of the way for them: see has_own_sprint_pose().)
+func _update_sprint_pose(s: Slot) -> void:
+	if action != Action.NONE or not has_own_sprint_pose():
+		return
+	var want := player.is_sprinting and player.get_horizontal_speed() > player.run_speed * 0.9
+	if want != _sprint_pose:
+		_sprint_pose = want
+		# Its own way back if it has one (the kunai twirls back round), else ease to idle.
+		var back := "sprint_end" if s.anim.has_animation("sprint_end") else "idle"
+		s.anim.play("sprint" if want else back, SPRINT_POSE_BLEND)
+
+
+func has_own_sprint_pose() -> bool:
+	var s := slot()
+	return s != null and s.anim != null and s.anim.has_animation("sprint")
+
+
 func _start(a: Action, length: float) -> void:
+	_sprint_pose = false # The action's own animation takes over.
 	action = a
 	_action_t = 0.0
 	_action_len = length
@@ -407,9 +511,10 @@ func _equip(i: int) -> void:
 	_prime = 0.0
 	_bolt_kick = 0.0
 	# Weapons take turns through their "draw*" animations (flourish, quick, flourish...),
-	# except guns while always_flourish_guns is on: always the full flourish.
+	# except guns while always_flourish_guns is on and knives without alternate_draws: always
+	# the full flourish.
 	var draws: Array = []
-	if not s.data.is_melee and always_flourish_guns:
+	if (always_flourish_guns if not s.data.is_melee else not s.data.alternate_draws):
 		draws = ["draw"]
 	elif s.anim != null:
 		draws = Array(s.anim.get_animation_list()).filter(func(n: StringName) -> bool: return String(n).begins_with("draw"))
@@ -437,13 +542,13 @@ func _request_switch(i: int) -> void:
 		return
 	_pending = i
 	_aim_toggled = false
+	if i < GUN_SLOTS:
+		Sfx.play("gun_swap", -10.0) # A rattle of sling and buckles; knives come out quietly (their draw rings).
 	if not stow_on_switch:
-		Sfx.play("swap", -10.0)
 		_equip(i)
 		return
 	_start(Action.HOLSTER, slot().data.holster_time)
 	_play(slot(), "idle")
-	Sfx.play("swap", -10.0)
 
 
 ## Q: the weapon you had out before this one, like CS. Q Q swaps out and straight back,
@@ -472,22 +577,22 @@ func _raise_again() -> void:
 	_start(Action.DRAW, maxf(up * lowered, 0.05))
 
 
-func _try_reload() -> void:
+func _try_reload(blend: float = BLEND) -> void:
 	var s := slot()
 	if s.mag >= s.data.mag_size:
 		return
-	if not infinite_reserve and s.reserve <= 0:
+	if spare(s.data) <= 0:
 		return
 	var empty := s.mag == 0
 	_reload_committed = false
 	_stop_after_shell = false
 	if s.data.shell_reload:
 		_shell_phase = Shells.START
-		_start(Action.RELOAD, _play(s, "reload_start", s.data.reload_start_time))
+		_start(Action.RELOAD, _play(s, "reload_start", s.data.reload_start_time, blend))
 		return
 	var t := s.data.reload_empty_time if empty else s.data.reload_time
 	var anim_name := "reload_empty" if empty else "reload"
-	_start(Action.RELOAD, _play(s, anim_name, t))
+	_start(Action.RELOAD, _play(s, anim_name, t, blend))
 	_commit_at = _mag_in_time(s, anim_name, t, s.data.reload_commit)
 
 
@@ -500,13 +605,12 @@ func _tick_shell_reload() -> void:
 	if _shell_phase == Shells.LOAD and not _reload_committed and _action_t >= _commit_at:
 		_reload_committed = true
 		s.mag += 1
-		if not infinite_reserve:
-			s.reserve -= 1
+		_use_spare(d, 1)
 	if _action_t < _action_len:
 		return
 	if _shell_phase == Shells.END:
 		action = Action.NONE
-	elif s.mag < d.mag_size and (infinite_reserve or s.reserve > 0) and not _stop_after_shell:
+	elif s.mag < d.mag_size and spare(d) > 0 and not _stop_after_shell:
 		_shell_phase = Shells.LOAD
 		_reload_committed = false
 		_start(Action.RELOAD, _play(s, "reload_shell", d.shell_time, 0.0))
@@ -533,18 +637,19 @@ func _mag_in_time(s: Slot, anim_name: String, fit: float, fallback: float) -> fl
 
 
 func _cancel_inspect() -> void:
+	if slot().model.has_method("stop_sounds"):
+		slot().model.stop_sounds() # Its flourish sounds stop with it.
 	action = Action.NONE
-	_play(slot(), "idle")
+	_play(slot(), "idle", -1.0, INSPECT_CANCEL_BLEND) # Eases back rather than snapping.
 
 
 func _commit_reload() -> void:
 	var s := slot()
 	_reload_committed = true
 	var need := s.data.mag_size - s.mag
-	var take := need if infinite_reserve else mini(need, s.reserve)
+	var take := mini(need, spare(s.data))
 	s.mag += take
-	if not infinite_reserve:
-		s.reserve -= take
+	_use_spare(s.data, take)
 
 
 func _start_melee(kind: Melee) -> void:
@@ -571,11 +676,16 @@ func _start_melee(kind: Melee) -> void:
 			_play(slot(), "melee_lower", length, 0.06)
 			_melee_hit_time = md.quick_hit_time
 			_melee_damage = md.light_damage
+	# Some attacks play on past the point you can act again (the butterfly's twirl): their
+	# animation says when (its "busy" meta).
+	var anim_name: String = knife.anim.current_animation if knife.anim != null else ""
+	if anim_name != "" and knife.anim.get_animation(anim_name).has_meta("busy"):
+		length = minf(length, float(knife.anim.get_animation(anim_name).get_meta("busy")))
 	_start(Action.MELEE, length)
 	_melee_kind = kind
 	_melee_done = false
 	_aim_toggled = false
-	Sfx.play("knife_swing", -4.0 if kind == Melee.HEAVY else -7.0)
+	Sfx.play_voiced("knife_swing", voice_of(knife.data), -4.0 if kind == Melee.HEAVY else -7.0)
 
 
 func _melee_hit() -> void:
@@ -587,12 +697,28 @@ func _melee_hit() -> void:
 		var hit := _ray(eye.origin, eye.origin + dir * reach)
 		if hit.is_empty():
 			continue
-		var hit_target := deal_damage(hit.collider, _melee_damage, 1.0, hit.position)
+		var victim := _damageable(hit.collider)
+		var hit_target := false
+		if victim != null and (victim is Enemy or victim.is_in_group("targets")) and _is_behind(victim as Node3D):
+			# Backstab: double damage, shown as a crit (big gold number, head-hit ding).
+			_apply_damage(victim, _melee_damage * BACKSTAB_MULTIPLIER, true, hit.position)
+			hit_target = true
+		else:
+			hit_target = deal_damage(hit.collider, _melee_damage, 1.0, hit.position)
+		if hit.collider is PhysicsProp:
+			(hit.collider as PhysicsProp).push(dir * _melee_damage * PROP_SHOT_PUSH, hit.position)
 		if not hit_target:
 			WeaponFx.impact(get_tree().current_scene, hit.position, hit.normal, false)
-		Sfx.play("knife_hit", 0.0 if hit_target else -8.0)
+		Sfx.play_voiced("knife_hit", voice_of(knife.data), 0.0 if hit_target else -8.0)
 		player.add_view_punch(-2.5 if _melee_kind == Melee.HEAVY else -1.2)
 		return
+
+
+## Are we behind it: is it facing (roughly) away from us?
+func _is_behind(victim: Node3D) -> bool:
+	var to := victim.global_position - player.global_position
+	var facing: Vector3 = victim.get_facing() if victim.has_method("get_facing") else -victim.global_basis.z
+	return Vector2(facing.x, facing.z).normalized().dot(Vector2(to.x, to.z).normalized()) > BACKSTAB_DOT
 
 
 func _start_throw() -> void:
@@ -609,7 +735,7 @@ func _release_throw() -> void:
 	var at := Transform3D(eye.basis, eye.origin + fwd * 0.5 + eye.basis.x * 0.12 - eye.basis.y * 0.08)
 	var vel := fwd * throw_speed + Vector3.UP * 2.0 + player.velocity
 	var spin := eye.basis.x * -16.0 + eye.basis.y * randf_range(-3.0, 3.0) # End over end.
-	var p := WeaponPickup.spawn(get_tree().current_scene, s.data, s.mag, s.reserve, at, vel, spin, self)
+	var p := WeaponPickup.spawn(get_tree().current_scene, s.data, s.mag, at, vel, spin, self)
 	p.add_collision_exception_with(player)
 	s.model.visible = false
 	Sfx.play("throw", -2.0)
@@ -620,7 +746,7 @@ func _try_pickup() -> void:
 	var p := get_pickup_candidate()
 	if p == null:
 		return
-	_add_gun(p.weapon, p.mag, p.reserve)
+	_add_gun(p.weapon, p.mag)
 	p.queue_free()
 	Sfx.play("pickup", -2.0)
 
@@ -636,7 +762,7 @@ func _auto_pickup() -> void:
 		var to := p.global_position - feet
 		if Vector2(to.x, to.z).length() > auto_pickup_radius or to.y < -0.5 or to.y > 1.6:
 			continue
-		_add_gun(p.weapon, p.mag, p.reserve, false)
+		_add_gun(p.weapon, p.mag, false)
 		p.queue_free()
 		Sfx.play("pickup", -2.0)
 		return
@@ -644,7 +770,7 @@ func _auto_pickup() -> void:
 
 ## Puts a gun in a free slot, or swaps out the one in hand (dropping it). Draws it
 ## unless `equip` is off.
-func _add_gun(d: WeaponData, mag: int, reserve: int, equip: bool = true) -> void:
+func _add_gun(d: WeaponData, mag: int, equip: bool = true) -> void:
 	var target := -1
 	for i in GUN_SLOTS:
 		if _slots[i] == null:
@@ -653,7 +779,7 @@ func _add_gun(d: WeaponData, mag: int, reserve: int, equip: bool = true) -> void
 	if target < 0:
 		target = current if current < GUN_SLOTS else _last_gun
 		_drop(target)
-	_slots[target] = _make_slot(d, mag, reserve)
+	_slots[target] = _make_slot(d, mag)
 	if equip:
 		_equip(target)
 
@@ -663,7 +789,7 @@ func _drop(i: int) -> void:
 	var eye := player.head.global_transform
 	var fwd := -eye.basis.z
 	var at := Transform3D(eye.basis, eye.origin + fwd * 0.4 - eye.basis.y * 0.3)
-	var p := WeaponPickup.spawn(get_tree().current_scene, s.data, s.mag, s.reserve, at,
+	var p := WeaponPickup.spawn(get_tree().current_scene, s.data, s.mag, at,
 			fwd * 2.5 + Vector3.UP * 1.5 + player.velocity, Vector3(randf(), randf(), randf()) * 2.0)
 	p.add_collision_exception_with(player)
 	_free_slot(i)
@@ -675,14 +801,19 @@ func _tick_fire(s: Slot, fire_held: bool) -> void:
 	var d := s.data
 	var pressed := _semi_buffer > 0.0
 	var trigger := fire_held if d.fire_mode == WeaponData.FireMode.AUTO else pressed
+	var bursting := s.burst and d.burst_count > 0
+	if bursting:
+		trigger = pressed or _burst_left > 0 # A burst carries on by itself once started.
 	if trigger and action == Action.INSPECT:
 		action = Action.NONE
 	# No shooting until a draw or reload has completely finished. A shell reload stops after
 	# the shell going in when you pull the trigger, then you can fire once it's closed up.
 	if trigger and action == Action.RELOAD and d.shell_reload and s.mag > 0:
 		_stop_after_shell = true
-	var ready := action == Action.NONE and _sprint_out <= 0.0 and not player.is_sprinting
+	var ready := action == Action.NONE and _sprint_out <= 0.0 and not player.is_sprinting \
+			and player.state != Player.MoveState.MANTLE and not player.health.healing
 	if not (trigger and ready):
+		_burst_left = 0
 		_shot_timer = maxf(_shot_timer, 0.0)
 		if _prime > 0.0: # Let go before the hammer was back: ease it down.
 			_prime = 0.0
@@ -702,11 +833,26 @@ func _tick_fire(s: Slot, fire_held: bool) -> void:
 		_shot_timer = 0.0
 		if _prime <= 0.0:
 			_play(s, "prime", d.prime_time, 0.05)
-			Sfx.play("hammer", -6.0)
+			Sfx.play_voiced("hammer", voice_of(d), -6.0)
 		_prime += get_physics_process_delta_time()
 		if _prime < d.prime_time:
 			return
 		_prime = 0.0
+	if bursting:
+		# Burst: a pull fires burst_count rounds at burst_rpm, then it waits 60 / rpm before the next.
+		if _burst_left <= 0:
+			if _shot_timer > 0.0:
+				return
+			_burst_left = d.burst_count
+			_semi_buffer = 0.0
+		while _shot_timer <= 0.0 and s.mag > 0 and _burst_left > 0:
+			_shoot(s)
+			_burst_left -= 1
+			_shot_timer += 60.0 / (d.burst_rpm if _burst_left > 0 else d.rpm)
+		if s.mag == 0:
+			_burst_left = 0
+			_try_reload()
+		return
 	while _shot_timer <= 0.0 and s.mag > 0:
 		_shoot(s)
 		_shot_timer += 60.0 / d.rpm
@@ -727,21 +873,41 @@ func _shoot(s: Slot) -> void:
 	var cone := lerpf(d.pellet_spread, d.pellet_spread_ads, ads)
 	var world := get_tree().current_scene
 	var hits := {} # Target -> damage summed over pellets, so a shotgun blast lands as one hit.
+	# What the other players need to draw this shot (see Player.broadcast_shot).
+	var ends := PackedVector3Array()
+	var normals := PackedVector3Array()
+	var hit_kinds := PackedByteArray()
 	for i in d.pellets:
-		var dir := aim if i == 0 else _pellet_direction(aim_basis, cone, i, d.pellets)
+		var dir := _pellet_line_direction(aim_basis, cone, i, d.pellets) if d.pellet_line \
+				else aim if i == 0 else _pellet_direction(aim_basis, cone, i, d.pellets)
 		var from := eye.origin
 		var end := from + dir * max_range
 		var hit := _ray(from, end)
+		var normal := Vector3.ZERO
+		var kind := 0
 		if not hit.is_empty():
 			end = hit.position
+			normal = hit.normal
 			var target := _damageable(hit.collider)
-			WeaponFx.impact(world, end, hit.normal, target == null)
+			var prop := hit.collider as PhysicsProp
+			if prop != null: # Bullets knock crates and bodies about.
+				prop.push(dir * d.damage * PROP_SHOT_PUSH, end)
+				if prop.kind == PhysicsProp.Kind.CRATE and i == 0:
+					Sfx.play_at("impact_wood", end, -8.0)
+			elif target is BreachDoor and i == 0:
+				Sfx.play_at("impact_metal", end, -6.0)
+			kind = 1 if target == null and prop == null else 2 # No bullet holes on things that move.
+			WeaponFx.impact(world, end, normal, kind == 1)
 			if target != null:
-				var headshot: bool = (hit.collider as Node).get_meta("hitzone", "body") == "head"
+				var headshot := _is_head(hit)
 				var h: Dictionary = hits.get_or_add(target, {amount = 0.0, headshot = false, pos = end})
 				h.amount += d.damage * _falloff(d, from.distance_to(end)) * (d.head_multiplier if headshot else 1.0)
 				h.headshot = h.headshot or headshot
 		WeaponFx.tracer(world, s.muzzle.global_position, end)
+		ends.append(end)
+		normals.append(normal)
+		hit_kinds.append(kind)
+	player.broadcast_shot("shot_" + d.sound_prefix, ends, normals, hit_kinds)
 	for target: Node in hits:
 		_apply_damage(target, hits[target].amount, hits[target].headshot, hits[target].pos)
 
@@ -776,6 +942,18 @@ func deal_damage(collider: Object, amount: float, head_mult: float, pos: Vector3
 	return true
 
 
+## A ray hit on a head: the body hit is tagged hitzone = "head" (target dummies), or the
+## collision shape hit is (enemies, whose head is a second shape on the same body).
+func _is_head(hit: Dictionary) -> bool:
+	var col := hit.collider as CollisionObject3D
+	if col == null:
+		return false
+	if col.get_meta("hitzone", "body") == "head":
+		return true
+	var shape := col.shape_owner_get_owner(col.shape_find_owner(hit.shape)) as Node
+	return shape != null and shape.get_meta("hitzone", "body") == "head"
+
+
 ## The node with take_damage() that owns this collider, or null.
 func _damageable(collider: Object) -> Node:
 	var n := collider as Node
@@ -795,7 +973,7 @@ func _apply_damage(n: Node, amount: float, headshot: bool, pos: Vector3) -> void
 
 func _ray(from: Vector3, to: Vector3) -> Dictionary:
 	var q := PhysicsRayQueryParameters3D.create(from, to)
-	q.collision_mask = 1 # World and targets, not pickups.
+	q.collision_mask = SHOT_MASK
 	q.exclude = [player.get_rid()]
 	return player.get_world_3d().direct_space_state.intersect_ray(q)
 
@@ -814,6 +992,15 @@ func _pellet_direction(basis: Basis, cone_deg: float, i: int, count: int) -> Vec
 	var a := TAU * float(i - 1) / float(count - 1) + randf_range(-0.25, 0.25)
 	var r := deg_to_rad(cone_deg) * randf_range(0.55, 1.0)
 	return (basis * Vector3(sin(r) * cos(a), sin(r) * sin(a), -cos(r))).normalized()
+
+
+## Line pattern (the Breacher, like Apex's Mastiff): the pellets spaced evenly across a flat
+## horizontal line `half_deg` either side of the aim point, with a hair of jitter.
+func _pellet_line_direction(basis: Basis, half_deg: float, i: int, count: int) -> Vector3:
+	var u := -1.0 + 2.0 * float(i) / float(maxi(count - 1, 1))
+	var yaw := deg_to_rad(half_deg * u + randf_range(-0.15, 0.15))
+	var pitch := deg_to_rad(randf_range(-0.12, 0.12))
+	return (basis * Vector3(sin(yaw), sin(pitch), -cos(yaw) * cos(pitch))).normalized()
 
 
 func _pattern(d: WeaponData, i: int) -> Vector2:
@@ -839,6 +1026,42 @@ func slot() -> Slot:
 	return _slots[current]
 
 
+## The fire mode key (X): guns with a burst mode switch between it and their normal mode.
+func _toggle_fire_mode() -> void:
+	var s := slot()
+	if s == null or s.data.burst_count <= 0:
+		return
+	s.burst = not s.burst
+	_burst_left = 0
+	Sfx.play("dry_fire", -8.0) # The selector clicking over.
+
+
+## What the HUD shows for the fire mode: "BURST" or "SEMI" / "AUTO" on a gun that can
+## switch, "" on one that can't.
+func get_fire_mode_name() -> String:
+	var s := slot()
+	if s == null or s.data.burst_count <= 0:
+		return ""
+	if s.burst:
+		return "BURST"
+	return "AUTO" if s.data.fire_mode == WeaponData.FireMode.AUTO else "SEMI"
+
+
+## The colour of a weapon's ammo type (AMMO): the ammo counter's underline. White for knives.
+static func ammo_color(d: WeaponData) -> Color:
+	if d == null or not AMMO.has(d.ammo_type):
+		return Color.WHITE
+	return AMMO[d.ammo_type].color
+
+
+## Whose handling sounds a weapon makes (Sfx.play_voiced()): a knife's id, else the gun's sound_prefix.
+static func voice_of(d: WeaponData) -> String:
+	if d == null:
+		return ""
+	var knife := Settings.knife_id(d)
+	return knife if knife != "" else d.sound_prefix
+
+
 func data() -> WeaponData:
 	return slot().data
 
@@ -852,17 +1075,33 @@ func get_spread_deg() -> float:
 	return spread
 
 
+## The crosshair's vertical opening: as get_spread_deg(), but a line-spread shotgun's pellets
+## only fan out sideways.
+func get_vertical_spread_deg() -> float:
+	return _aim_spread_deg() if data().pellet_line else get_spread_deg()
+
+
 ## Cone (degrees) the shot's aim point can land in.
 func _aim_spread_deg() -> float:
 	var d := data()
 	if d.is_melee:
 		return 0.0
 	var hip := 1.0 - ads
-	var spread := lerpf(d.hip_spread, d.ads_spread, ads)
-	spread += clampf(player.get_horizontal_speed() / player.sprint_speed, 0.0, 1.0) * lerpf(d.move_spread, d.ads_move_spread, ads)
-	if not player.is_on_floor():
+	var speed := player.get_horizontal_speed()
+	var grounded := player.is_on_floor()
+	# Steadier crouched and standing still (they stack, down to MIN_STEADY): the base spread
+	# and the bloom shrink. Standing still you're nearly dead on, except with a scoped rifle.
+	var steady := 1.0
+	if grounded and player.is_crouched:
+		steady -= crouch_accuracy
+	if grounded:
+		var still := (still_accuracy_scoped if d.scope_overlay else still_accuracy) * (1.0 - clampf(speed / STILL_SPEED, 0.0, 1.0))
+		steady = maxf(steady - still, MIN_STEADY)
+	var spread := lerpf(d.hip_spread, d.ads_spread, ads) * steady
+	spread += clampf(speed / player.sprint_speed, 0.0, 1.0) * lerpf(d.move_spread, d.ads_move_spread, ads)
+	if not grounded:
 		spread += d.air_spread * hip
-	return spread + _bloom * hip
+	return spread + _bloom * hip * steady
 
 
 ## Fully aimed with a scoped weapon: the HUD shows the scope instead of the viewmodel.
@@ -875,7 +1114,98 @@ func get_mag() -> int:
 
 
 func get_reserve() -> int:
-	return -1 if infinite_reserve else slot().reserve
+	return -1 if infinite_reserve else spare(data())
+
+
+# --- Ammo ------------------------------------------------------------------------
+
+## Spare rounds for this gun (shared with every gun taking its ammo type).
+func spare(d: WeaponData) -> int:
+	if infinite_reserve:
+		return 1 << 20
+	return ammo.get(d.ammo_type, 0)
+
+
+func _use_spare(d: WeaponData, rounds: int) -> void:
+	if not infinite_reserve and ammo.has(d.ammo_type):
+		ammo[d.ammo_type] = maxi(ammo[d.ammo_type] - rounds, 0)
+
+
+## Room for more of this ammo?
+func can_take_ammo(type: String) -> bool:
+	return not infinite_reserve and AMMO.has(type) and ammo.get(type, 0) < int(AMMO[type].carry)
+
+
+## Adds spare rounds, up to the carry limit. Returns how many fit.
+func give_ammo(type: String, rounds: int) -> int:
+	if not AMMO.has(type):
+		return 0
+	var room: int = int(AMMO[type].carry) - ammo.get(type, 0)
+	var took := clampi(rounds, 0, room)
+	ammo[type] = ammo.get(type, 0) + took
+	return took
+
+
+## An ammo box you took (the host passes it on: see PlayerHealth.give_ammo()).
+func receive_ammo(type: String, rounds: int) -> void:
+	if give_ammo(type, rounds) > 0:
+		Sfx.play("pickup", -2.0)
+
+
+## A new map: unlimited ammo in the hub; on an expedition, your starting spares. Mags
+## are topped up either way.
+func _restock() -> void:
+	infinite_reserve = not Game.in_expedition()
+	ammo = {}
+	for type: String in AMMO_ORDER:
+		ammo[type] = 0 if infinite_reserve else int(AMMO[type].start)
+	for i in GUN_SLOTS:
+		var s: Slot = _slots[i]
+		if s != null:
+			s.mag = s.data.mag_size
+
+
+# --- Inventory (the Tab screen) ------------------------------------------------------
+
+## The weapon in a slot (null if empty). 0-1 guns, 2 the knife.
+func get_slot_data(i: int) -> WeaponData:
+	var s: Slot = _slots[i] if i >= 0 and i < _slots.size() else null
+	return s.data if s != null else null
+
+
+func get_slot_mag(i: int) -> int:
+	var s: Slot = _slots[i] if i >= 0 and i < _slots.size() else null
+	return s.mag if s != null else 0
+
+
+## Swaps your two guns between slots (what's in your hands stays in your hands).
+func swap_gun_slots() -> void:
+	if action == Action.THROW or action == Action.MELEE:
+		return
+	var a: Slot = _slots[0]
+	_slots[0] = _slots[1]
+	_slots[1] = a
+	if current < GUN_SLOTS:
+		current = 1 - current
+	if _pending < GUN_SLOTS:
+		_pending = 1 - _pending
+	if _last_slot >= 0 and _last_slot < GUN_SLOTS:
+		_last_slot = 1 - _last_slot
+	_last_gun = 1 - _last_gun
+	Sfx.play("gun_swap", -10.0)
+
+
+## Drops a gun at your feet (from the inventory). The one in your hands too: you switch
+## to your other gun, or the knife.
+func drop_gun(i: int) -> void:
+	if i < 0 or i >= GUN_SLOTS or _slots[i] == null or action == Action.THROW:
+		return
+	var in_hand := i == get_selected_slot()
+	_drop(i)
+	if in_hand:
+		action = Action.NONE
+		_equip(1 - i if _slots[1 - i] != null else MELEE_SLOT)
+	Sfx.play("catch", -8.0)
 
 
 func is_reloading() -> bool:
@@ -908,7 +1238,7 @@ func get_selected_slot() -> int:
 
 
 func can_buy() -> bool:
-	return buy_zones > 0
+	return buy_zones > 0 and is_physics_processing()
 
 
 ## True if this weapon is in a slot (for knives: the knife you carry).
@@ -940,10 +1270,9 @@ func buy(d: WeaponData) -> void:
 		var s: Slot = _slots[i]
 		if s != null and s.data == d:
 			s.mag = d.mag_size
-			s.reserve = d.reserve_ammo
 			_request_switch(i)
 			return
-	_add_gun(d, -1, -1)
+	_add_gun(d, -1)
 
 
 func has_free_gun_slot() -> bool:

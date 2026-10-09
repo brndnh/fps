@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/weapons/negev.tscn" id="1_hx0f3"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="2_i31m2"]
+
+[resource]
+script = ExtResource("2_i31m2")
+display_name = "Negev"
+model_scene = ExtResource("1_hx0f3")
+sound_prefix = "negev"
+bolt_kick = 0.0
+rpm = 780.0
+damage = 13.0
+head_multiplier = 2.0
+falloff_start = 35.0
+mag_size = 60
+ammo_type = "heavy"
+reload_time = 4.4
+reload_empty_time = 4.8
+reload_commit = 0.65
+draw_time = 1.1
+quick_draw_time = 0.55
+move_speed = 0.88
+holster_time = 0.3
+ads_time = 0.3
+ads_move_speed = 0.45
+sprint_to_fire_time = 0.3
+hip_spread = 2.6
+move_spread = 1.8
+air_spread = 3.0
+bloom_per_shot = 0.06
+bloom_decay = 4.0
+recoil_pattern = PackedVector2Array(0, 0.4, 0.062666155, 0.4, 0.07790781, 0.4, 0.03419039, 0.4, -0.035401635, 0.4, -0.07820241, 0.22, -0.06182116, 0.22, 0.001345112, 0.22, 0.06349343, 0.22, 0.07759119, 0.22, 0.03296948, 0.22, -0.036602873, 0.22, -0.0784749, 0.22, -0.060958687, 0.22, 0.0026898438, 0.22, 0.06430276, 0.1, 0.07725262, 0.1, 0.031739246, 0.1, -0.03779376, 0.1, -0.078725204, 0.1, -0.06007898, 0.1, 0.004033815, 0.1, 0.0650939, 0.1, 0.07689222, 0.1, 0.03050004, 0.1, -0.03897396, 0.1, -0.078953244, 0.1, -0.059182286, 0.1, 0.005376646, 0.1, 0.06586664, 0.1, 0.07651007, 0.1, 0.029252209, 0.1, -0.040143143, 0.1, -0.07915897, 0.1, -0.05826886, 0.1, 0.0067179566, 0.1, 0.06662076, 0.1, 0.0761063, 0.1, 0.02799611, 0.1, -0.04130098, 0.1, -0.079342306, 0.1, -0.05733896, 0.1, 0.008057368, 0.1, 0.06735604, 0.1, 0.07568101, 0.1, 0.026732095, 0.1, -0.042447135, 0.1, -0.079503216, 0.1, -0.056392852, 0.1, 0.009394501, 0.1, 0.06807228, 0.1, 0.07523432, 0.1, 0.02546052, 0.1, -0.04358129, 0.1, -0.07964165, 0.1, -0.055430796, 0.1, 0.010728979, 0.1, 0.068769276, 0.1, 0.07476636, 0.1, 0.02418175, 0.1)
+recoil_scale_ads = 0.8
+recoil_jitter = 0.06
+recoil_recovery = 9.0
+hip_position = Vector3(0.2, -0.21, -0.54)
+ads_position = Vector3(0, -0.066, -0.36)
+kick_back = 0.03
+kick_rotation = 2.4
+muzzle_flash_size = 1.15
+throw_damage = 35.0

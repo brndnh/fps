@@ -11,7 +11,7 @@ const COLOR := Color(0.35, 1.0, 0.45)
 
 func _ready() -> void:
 	collision_layer = 0
-	collision_mask = 1
+	collision_mask = 4 # Players.
 	var cs := CollisionShape3D.new()
 	var box := BoxShape3D.new()
 	box.size = size

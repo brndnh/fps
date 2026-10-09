@@ -34,6 +34,32 @@ static func tracer(parent: Node, from: Vector3, to: Vector3) -> void:
 	tw.tween_callback(mi.queue_free)
 
 
+## Floating damage number that drifts up and fades. Only the shooter sees these.
+static func damage_number(parent: Node, at: Vector3, amount: float, color: Color, big: bool) -> void:
+	var l := Label3D.new()
+	l.text = str(roundi(amount))
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	l.fixed_size = true
+	l.pixel_size = 0.0009
+	l.font_size = 52 if big else 40
+	l.outline_size = 12
+	l.outline_modulate = Color(0, 0, 0, 0.85)
+	l.modulate = color
+	l.render_priority = 20
+	l.outline_render_priority = 19
+	parent.add_child(l)
+	var side := Vector3(randf_range(-0.25, 0.25), 0.0, 0.0)
+	l.global_position = at + Vector3(0.0, 0.15, 0.0) + side
+	var tw := l.create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(l, "global_position", l.global_position + Vector3(0.0, 0.5, 0.0) + side, 0.7) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(l, "modulate:a", 0.0, 0.3).set_delay(0.45)
+	tw.tween_property(l, "outline_modulate:a", 0.0, 0.3).set_delay(0.45)
+	tw.chain().tween_callback(l.queue_free)
+
+
 ## Bullet hole + spark. Pass decal = false for things that move (targets).
 static func impact(parent: Node, pos: Vector3, normal: Vector3, decal: bool = true) -> void:
 	if decal:

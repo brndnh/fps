@@ -8,7 +8,7 @@ signal changed
 const SAVE_PATH := "user://settings.cfg"
 ## Bump when a default changes and old saves should pick up the new one.
 ## 2: aim down sights became toggle by default.
-const VERSION := 2
+const VERSION := 3
 const SOURCE_YAW := 0.022 # degrees per count at sens 1.0
 
 ## Actions shown in the Controls tab, grouped for the UI.
@@ -23,7 +23,8 @@ const REBINDABLE := {
 		["inspect", "Inspect"], ["melee", "Melee"],
 		["weapon_1", "Weapon 1"], ["weapon_2", "Weapon 2"], ["weapon_3", "Knife"],
 		["weapon_last", "Last weapon"], ["weapon_next", "Next weapon"], ["weapon_prev", "Previous weapon"],
-		["throw_weapon", "Throw weapon"], ["interact", "Pick up"], ["buy_menu", "Buy menu"], ["map_menu", "Maps"],
+		["throw_weapon", "Throw weapon"], ["interact", "Use / Revive / Pick up"], ["buy_menu", "Buy menu"], ["map_menu", "Map"],
+		["heal", "Heal (hold for the wheel)"], ["inventory", "Inventory"], ["flip_hand", "Switch hands"], ["fire_mode", "Fire mode"],
 	],
 }
 const SLOTS := 2
@@ -36,27 +37,43 @@ const KNIVES := [
 	["bowie", "Bowie Knife", "res://weapons/knife_bowie.tres"],
 	["karambit", "Karambit", "res://weapons/knife_karambit.tres"],
 	["butterfly", "Butterfly Knife", "res://weapons/knife_butterfly.tres"],
-	["flip", "Flip Knife", "res://weapons/knife_flip.tres"],
 	["stiletto", "Stiletto Knife", "res://weapons/knife_stiletto.tres"],
 	["daggers", "Shadow Daggers", "res://weapons/knife_daggers.tres"],
+	["kunai", "Kunai", "res://weapons/knife_kunai.tres"],
 ]
 
 var sensitivity: float = 2.0
 var invert_y: bool = false
 var fov: float = 106.0 ## Horizontal FOV at 16:9 (CS2 = 106).
 var toggle_crouch: bool = false
+var left_handed: bool = false ## Viewmodel mirrored: weapons held in the left hand (H flips it).
 var toggle_sprint: bool = false
 var toggle_aim: bool = true
 var ads_sensitivity: float = 1.0 ## Multiplier on top of zoom-matched ADS sensitivity.
 var knife: String = "combat" ## Id from KNIVES.
+var player_name: String = "Player" ## Shown to other players. Read it with get_player_name().
 
 var _default_bindings := {} # action -> Array[InputEvent|null] (from project.godot)
+var _name_override := "" ## From `--name=<name>` on the command line, so two copies on one PC differ. Not saved.
 
 
 func _ready() -> void:
 	for action in all_actions():
 		_default_bindings[action] = _slots_from_events(InputMap.action_get_events(action))
 	load_settings()
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--name="):
+			_name_override = arg.trim_prefix("--name=")
+
+
+func get_player_name() -> String:
+	return _name_override if _name_override != "" else player_name
+
+
+## Renaming in the lobby replaces any command-line name too.
+func set_player_name(new_name: String) -> void:
+	_name_override = ""
+	set_value("player_name", new_name)
 
 
 # --- Values -------------------------------------------------------------------
@@ -144,6 +161,7 @@ func reset_all() -> void:
 	invert_y = false
 	fov = 106.0
 	toggle_crouch = false
+	left_handed = false
 	toggle_sprint = false
 	toggle_aim = true
 	ads_sensitivity = 1.0
@@ -212,10 +230,12 @@ func save_settings() -> void:
 	cfg.set_value("mouse", "invert_y", invert_y)
 	cfg.set_value("video", "fov", fov)
 	cfg.set_value("movement", "toggle_crouch", toggle_crouch)
+	cfg.set_value("combat", "left_handed", left_handed)
 	cfg.set_value("movement", "toggle_sprint", toggle_sprint)
 	cfg.set_value("combat", "toggle_aim", toggle_aim)
 	cfg.set_value("mouse", "ads_sensitivity", ads_sensitivity)
 	cfg.set_value("loadout", "knife", knife)
+	cfg.set_value("profile", "name", player_name)
 	for action in all_actions():
 		var data: Array = []
 		for e: Variant in get_bindings(action):
@@ -232,6 +252,7 @@ func load_settings() -> void:
 	invert_y = cfg.get_value("mouse", "invert_y", invert_y)
 	fov = cfg.get_value("video", "fov", fov)
 	toggle_crouch = cfg.get_value("movement", "toggle_crouch", toggle_crouch)
+	left_handed = cfg.get_value("combat", "left_handed", left_handed)
 	toggle_sprint = cfg.get_value("movement", "toggle_sprint", toggle_sprint)
 	var version: int = cfg.get_value("meta", "version", 1)
 	# Saves from before v2 always stored hold-to-aim (every save writes every value),
@@ -240,8 +261,10 @@ func load_settings() -> void:
 		toggle_aim = cfg.get_value("combat", "toggle_aim", toggle_aim)
 	ads_sensitivity = cfg.get_value("mouse", "ads_sensitivity", ads_sensitivity)
 	knife = cfg.get_value("loadout", "knife", knife)
+	player_name = cfg.get_value("profile", "name", player_name)
 	for action in all_actions():
-		if not cfg.has_section_key("bindings", action):
+		# Saves from before v3 had fire mode on B (with the buy menu): it moves to X.
+		if not cfg.has_section_key("bindings", action) or (action == "fire_mode" and version < 3):
 			continue
 		var slots: Array = []
 		for d: Variant in cfg.get_value("bindings", action):

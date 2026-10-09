@@ -1,5 +1,7 @@
 extends CanvasLayer
-## Ammo counter, weapon slots, reload bar, pickup prompt, the sniper scope and the radar.
+## Ammo counter (underlined in its ammo type's colour) with the weapon slots under it (stacked
+## down the right, CS2 style: name and key, the one in your hands lit), reload bar, pickup
+## prompt, the sniper scope and the radar.
 ## Built in code; reads the WeaponManager every frame.
 
 const ACCENT := Color(0.35, 1.0, 0.45)
@@ -7,14 +9,16 @@ const LOW_AMMO := Color(1.0, 0.35, 0.3)
 const DIM := Color(1, 1, 1, 0.4)
 
 var _weapons: WeaponManager
-var _slots: Array[Label] = []
+var _slots: Array[Label] = [] ## Each slot's name and key.
+var _underline: ColorRect ## Under the ammo count, in the ammo type's colour.
 var _mag: Label
 var _reserve: Label
-var _name: Label
+var _mode: Label ## Fire mode (SEMI / BURST) on guns that can switch.
 var _hint: Label
 var _prompt: Label
 var _buy: Label
 var _ammo_row: HBoxContainer
+var _box: VBoxContainer
 var _bar_bg: ColorRect
 var _bar_fill: ColorRect
 var _scope: Control
@@ -26,7 +30,11 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if _weapons == null or not _weapons.is_physics_processing():
+	var armed := _weapons != null and _weapons.is_physics_processing()
+	_box.visible = armed # Downed or out: no weapons to show.
+	if not armed:
+		for c: Control in [_scope, _prompt, _buy, _bar_bg, _hint]:
+			c.visible = false
 		return
 	var d := _weapons.data()
 	var scoped := _weapons.is_scoped()
@@ -36,9 +44,10 @@ func _process(_delta: float) -> void:
 	var selected := _weapons.get_selected_slot()
 	var names := _weapons.get_slot_names()
 	for i in _slots.size():
-		_slots[i].text = "%d  %s" % [i + 1, names[i].to_upper() if names[i] != "" else "—"]
-		_slots[i].add_theme_color_override("font_color", ACCENT if i == selected else DIM)
-	_name.text = d.display_name.to_upper()
+		_slots[i].text = "%s   %d" % [names[i].to_upper() if names[i] != "" else "—", i + 1]
+		_slots[i].add_theme_color_override("font_color", Color.WHITE if i == selected else DIM)
+		_slots[i].add_theme_font_size_override("font_size", 22 if i == selected else 17)
+	_underline.color = WeaponManager.ammo_color(d)
 	var menu := get_parent().get_node_or_null("BuyMenu")
 	_buy.visible = _weapons.can_buy() and not (menu != null and menu.is_open())
 	_buy.text = "[%s]  BUY" % Settings.event_label(Settings.get_binding("buy_menu", 0))
@@ -60,6 +69,8 @@ func _process(_delta: float) -> void:
 	_mag.add_theme_color_override("font_color", LOW_AMMO if low else Color.WHITE)
 	var reserve := _weapons.get_reserve()
 	_reserve.text = "/ ∞" if reserve < 0 else "/ %d" % reserve
+	_mode.text = _weapons.get_fire_mode_name()
+	_mode.visible = _mode.text != ""
 
 	var reloading := _weapons.is_reloading()
 	_bar_bg.visible = reloading
@@ -84,9 +95,14 @@ func _build() -> void:
 	_scope.resized.connect(_scope.queue_redraw)
 	root.add_child(_scope)
 
-	root.add_child(Radar.new())
+	var radar := Radar.new()
+	root.add_child(radar)
+	var map := MapView.new() # The full map (M).
+	map.radar = radar
+	root.add_child(map)
 
 	var box := VBoxContainer.new()
+	_box = box
 	box.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	box.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	box.grow_vertical = Control.GROW_DIRECTION_BEGIN
@@ -95,31 +111,38 @@ func _build() -> void:
 	box.add_theme_constant_override("separation", 2)
 	root.add_child(box)
 
-	var slots := HBoxContainer.new()
-	slots.alignment = BoxContainer.ALIGNMENT_END
-	slots.add_theme_constant_override("separation", 18)
-	box.add_child(slots)
-	for i in 3:
-		var l := _label("", 16)
-		slots.add_child(l)
-		_slots.append(l)
-
 	var ammo := HBoxContainer.new()
 	_ammo_row = ammo
 	ammo.alignment = BoxContainer.ALIGNMENT_END
 	ammo.add_theme_constant_override("separation", 8)
 	box.add_child(ammo)
+	var mag_col := VBoxContainer.new() # The count with its ammo-colour underline.
+	mag_col.add_theme_constant_override("separation", 0)
+	ammo.add_child(mag_col)
 	_mag = _label("0", 64)
-	ammo.add_child(_mag)
+	mag_col.add_child(_mag)
+	_underline = ColorRect.new()
+	_underline.custom_minimum_size = Vector2(0, 5)
+	_underline.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mag_col.add_child(_underline)
 	_reserve = _label("/ 0", 28)
 	_reserve.add_theme_color_override("font_color", Color(1, 1, 1, 0.7))
 	_reserve.size_flags_vertical = Control.SIZE_SHRINK_END
 	ammo.add_child(_reserve)
+	_mode = _label("", 16)
+	_mode.add_theme_color_override("font_color", ACCENT)
+	_mode.size_flags_vertical = Control.SIZE_SHRINK_END
+	ammo.add_child(_mode)
 
-	_name = _label("", 20)
-	_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_name.add_theme_color_override("font_color", Color(1, 1, 1, 0.8))
-	box.add_child(_name)
+	var slots := VBoxContainer.new() # Under the ammo.
+	slots.alignment = BoxContainer.ALIGNMENT_END
+	slots.add_theme_constant_override("separation", 4)
+	box.add_child(slots)
+	for i in 3:
+		var l := _label("", 17)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		slots.add_child(l)
+		_slots.append(l)
 
 	# Reload bar + hint, just under the crosshair.
 	_bar_bg = ColorRect.new()
@@ -144,7 +167,7 @@ func _build() -> void:
 
 	_buy = _label("", 20)
 	_buy.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_buy.position = Vector2(40, -70)
+	_buy.position = Vector2(40, -160) # Above the health (StatusHUD).
 	_buy.add_theme_color_override("font_color", ACCENT)
 	root.add_child(_buy)
 
